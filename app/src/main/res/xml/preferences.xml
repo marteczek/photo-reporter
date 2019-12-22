@@ -1,0 +1,73 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/preference_picture_header">
+
+        <ListPreference
+            app:key="picture_host"
+            app:defaultValue="imgur_account"
+            app:entries="@array/preference_picture_host_entries"
+            app:entryValues="@array/preference_picture_host_values"
+            app:title="@string/preference_picture_host_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:key="picture_dimension"
+            app:defaultValue="1280"
+            app:entries="@array/preference_dimension_entries"
+            app:entryValues="@array/preference_dimension_values"
+            app:title="@string/preference_dimension_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:key="picture_order"
+            app:defaultValue="last_modified_asc"
+            app:entries="@array/preference_picture_order_entries"
+            app:entryValues="@array/preference_picture_order_values"
+            app:title="@string/preference_picture_order_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:key="picture_quality"
+            app:defaultValue="90"
+            app:entries="@array/preference_picture_quality_entries"
+            app:entryValues="@array/preference_picture_quality_values"
+            app:title="@string/preference_picture_quality_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:key="thumbnail_dimension"
+            app:defaultValue="200"
+            app:entries="@array/preference_thumbnail_dimension_entries"
+            app:entryValues="@array/preference_thumbnail_dimension_values"
+            app:title="@string/preference_thumbnail_dimension_title"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/preference_personal_information">
+
+        <EditTextPreference
+            app:key="signature"
+            app:title="@string/preference_signature_title"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/preference_post">
+
+        <ListPreference
+            app:key="pictures_per_post"
+            app:defaultValue="10"
+            app:entries="@array/preference_pictures_per_post_entries"
+            app:entryValues="@array/preference_pictures_per_post_values"
+            app:title="@string/preference_pictures_per_post__title"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            app:key="attach_app_footer"
+            app:defaultValue="true"
+            app:title="@string/preference_attach_app_footer" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

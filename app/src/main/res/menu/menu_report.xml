@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.marteczek.photoreporter.ui.ReportListActivity">
+    <item
+        android:id="@+id/action_upload_pictures"
+        android:title="@string/action_upload_pictures"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_create_post"
+        android:title="@string/action_create_post"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_open_post"
+        android:title="@string/action_open_posts"
+        app:showAsAction="never" />
+</menu>

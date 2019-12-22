@@ -1,0 +1,74 @@
+<resources>
+    <string-array name="preference_dimension_entries">
+        <item>1024</item>
+        <item>1280</item>
+        <item>1600</item>
+    </string-array>
+
+    <string-array name="preference_dimension_values">
+        <item>1024</item>
+        <item>1280</item>
+        <item>1600</item>
+    </string-array>
+
+    <string-array name="preference_picture_order_entries">
+        <item>@string/preference_default_order</item>
+        <item>@string/preference_last_modified_asc</item>
+        <item>@string/preference_last_modified_desc</item>
+    </string-array>
+
+    <string-array name="preference_picture_order_values">
+        <item>default</item>
+        <item>last_modified_asc</item>
+        <item>last_modified_desc</item>
+    </string-array>
+
+    <string-array name="preference_thumbnail_dimension_entries">
+        <item>150</item>
+        <item>200</item>
+        <item>250</item>
+    </string-array>
+
+    <string-array name="preference_thumbnail_dimension_values">
+        <item>150</item>
+        <item>200</item>
+        <item>250</item>
+    </string-array>
+
+    <string-array name="preference_picture_host_entries">
+        <item>@string/preference_imgur_account</item>
+    </string-array>
+
+    <string-array name="preference_picture_host_values" >
+        <item>imgur_account</item>
+    </string-array>
+
+    <string-array name="preference_pictures_per_post_entries" >
+        <item>1</item>
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+        <item>@string/preference_one_post</item>
+    </string-array>
+
+    <string-array name="preference_pictures_per_post_values" >
+        <item>1</item>
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+        <item>0</item>
+    </string-array>
+
+    <string-array name="preference_picture_quality_entries" >
+        <item>80</item>
+        <item>90</item>
+        <item>100</item>
+    </string-array>
+
+    <string-array name="preference_picture_quality_values" >
+        <item>80</item>
+        <item>90</item>
+        <item>100</item>
+    </string-array>
+
+</resources>
