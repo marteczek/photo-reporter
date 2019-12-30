@@ -78,7 +78,7 @@ public class ReportService extends BaseService {
                         itemDao.updatePictureRotationById(itemId, ImageUtils.getImageRotation(path));
                         itemDao.updateSuccessionById(itemId, succession++);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        if(E) Log.e(TAG, "IOException", e);
                         itemDao.deleteById(itemId);
                     }
                 }
@@ -87,7 +87,7 @@ public class ReportService extends BaseService {
                     handler.post(() -> onFinishedListener.onFinished(reportId));
                 }
             } catch (RuntimeException e) {
-                e.printStackTrace();
+                if(E) Log.e(TAG, "RuntimeException", e);
                 if (onErrorListener != null) {
                     onErrorListener.onError(e);
                 }
@@ -129,7 +129,7 @@ public class ReportService extends BaseService {
                     }
                 }
             } catch (RuntimeException e) {
-                e.printStackTrace();
+                if(E) Log.e(TAG, "RuntimeException", e);
                 if (onErrorListener != null) {
                     onErrorListener.onError(e);
                 }

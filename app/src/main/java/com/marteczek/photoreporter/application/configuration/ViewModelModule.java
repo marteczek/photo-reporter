@@ -5,15 +5,18 @@ import android.app.Application;
 import androidx.lifecycle.ViewModel;
 
 import com.marteczek.photoreporter.application.configuration.viewmodelfactory.ViewModelFactory;
+import com.marteczek.photoreporter.picturemanager.PictureManager;
 import com.marteczek.photoreporter.service.ItemService;
 import com.marteczek.photoreporter.service.PostService;
 import com.marteczek.photoreporter.service.ReportService;
 import com.marteczek.photoreporter.service.ThreadService;
+import com.marteczek.photoreporter.ui.PicturePreviewViewModel;
 import com.marteczek.photoreporter.ui.PostAllViewModel;
 import com.marteczek.photoreporter.ui.PostOpenInBrowserViewModel;
 import com.marteczek.photoreporter.ui.PostViewModel;
 import com.marteczek.photoreporter.ui.ReportListViewModel;
 import com.marteczek.photoreporter.ui.ReportViewModel;
+import com.marteczek.photoreporter.ui.SettingsWatermarkViewModel;
 import com.marteczek.photoreporter.ui.ThreadListViewModel;
 
 import java.lang.annotation.ElementType;
@@ -42,6 +45,13 @@ class ViewModelModule {
     @Provides
     ViewModelFactory viewModelFactory(Map<Class<? extends ViewModel>, Provider<ViewModel>> providerMap) {
         return new ViewModelFactory(providerMap);
+    }
+
+    @Provides
+    @IntoMap
+    @ViewModelKey(PicturePreviewViewModel.class)
+    ViewModel picturePreviewViewModel(Application application, PictureManager pictureManager) {
+        return new PicturePreviewViewModel(application, pictureManager);
     }
 
     @Provides
@@ -80,6 +90,13 @@ class ViewModelModule {
                               ItemService itemService, ThreadService threadService) {
         return new ReportViewModel(application, reportService, postService,
                 itemService, threadService);
+    }
+
+    @Provides
+    @IntoMap
+    @ViewModelKey(SettingsWatermarkViewModel.class)
+    ViewModel settingsViewModel(Application application, PictureManager pictureManager) {
+        return new SettingsWatermarkViewModel(application, pictureManager);
     }
 
     @Provides

@@ -71,4 +71,18 @@
         <item>100</item>
     </string-array>
 
+    <string-array name="preference_watermark_position_entries" >
+        <item>@string/preference_top_left_title</item>
+        <item>@string/preference_top_right_title</item>
+        <item>@string/preference_bottom_left_title</item>
+        <item>@string/preference_bottom_right_title</item>
+    </string-array>
+
+    <string-array name="preference_watermark_position_values" >
+        <item>@string/preference_top_left</item>
+        <item>@string/preference_top_right</item>
+        <item>@string/preference_bottom_left</item>
+        <item>@string/preference_bottom_right</item>
+    </string-array>
+
 </resources>

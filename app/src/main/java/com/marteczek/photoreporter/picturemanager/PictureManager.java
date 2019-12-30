@@ -1,11 +1,15 @@
 package com.marteczek.photoreporter.picturemanager;
 
+import android.graphics.Bitmap;
 import android.net.Uri;
 
+import java.io.File;
 import java.io.IOException;
 
 public interface PictureManager {
     String copy(Uri sourceUri, String newFileName) throws IOException;
+
+    File getFilesDir();
 
     String generateThumbnail(String sourcePath, String newFileName,
                              int requiredWidth, int requiredHeight);
@@ -13,8 +17,9 @@ public interface PictureManager {
     String resizeImage(String sourcePath, String newFileName,
                        int requiredWidth, int requiredHeight);
 
-    String rotateAndResizePicture(String sourcePath, String newFileName,
-                                  int pictureRotation, int greaterDimension);
+    Bitmap preparePictureForUpload(String sourcePath, int rotation, int greaterDimension);
+
+    String savePicture(Bitmap bitmap, String newFileName);
 
     boolean deleteFile(String path);
 }

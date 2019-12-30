@@ -22,24 +22,27 @@
         <activity
             android:name=".ui.FindThreadActivity"
             android:label="@string/title_activity_find_thread"
-            android:parentActivityName=".ui.ThreadListActivity"/>
+            android:parentActivityName=".ui.ThreadListActivity" />
         <activity
             android:name=".ui.ImgurLoginActivity"
-            android:label="@string/title_activity_sign_in"/>
+            android:label="@string/title_activity_sign_in" />
+        <activity android:name=".ui.PicturePreviewActivity"
+            android:label="@string/title_picture"
+            android:parentActivityName=".ui.ReportActivity" />
         <activity
             android:name=".ui.PostActivity"
             android:label="@string/title_activity_post"
             android:launchMode="singleTop"
-            android:parentActivityName=".ui.ReportActivity"/>
+            android:parentActivityName=".ui.ReportActivity" />
         <activity
             android:name=".ui.PostAllActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_send_all"
-            android:parentActivityName=".ui.PostActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"/>
+            android:parentActivityName=".ui.PostActivity" />
         <activity
             android:name=".ui.PostOpenInBrowserActivity"
             android:label="@string/title_activity_post_in_browser"
-            android:parentActivityName=".ui.PostActivity"/>
+            android:parentActivityName=".ui.PostActivity" />
         <activity
             android:name=".ui.ReportActivity"
             android:label="@string/title_activity_report"

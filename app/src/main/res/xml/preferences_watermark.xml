@@ -1,0 +1,30 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory app:title="@string/preference_watermark_header">
+
+        <SwitchPreferenceCompat
+            app:key="apply_watermark"
+            app:defaultValue="false"
+            app:title="@string/preference_apply_watermark_title" />
+
+        <com.marteczek.photoreporter.ui.misc.ImagePreference
+            app:key="watermark_image"
+            app:title= "@string/preference_watermark_image" />
+
+        <ListPreference
+            app:key="watermark_position"
+            app:defaultValue="@string/preference_bottom_right"
+            app:entries="@array/preference_watermark_position_entries"
+            app:entryValues="@array/preference_watermark_position_values"
+            app:title="@string/preference_watermark_position_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <SeekBarPreference
+            app:key="watermark_distance"
+            app:defaultValue="100"
+            android:max="400"
+            app:title="@string/preference_watermark_distance_title" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

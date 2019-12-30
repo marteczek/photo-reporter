@@ -48,6 +48,7 @@ import javax.inject.Inject;
 import dagger.android.AndroidInjection;
 
 import static com.marteczek.photoreporter.application.Settings.Debug.D;
+import static com.marteczek.photoreporter.application.Settings.Debug.E;
 import static java.lang.Math.round;
 
 public class ReportActivity extends AppCompatActivity {
@@ -173,7 +174,15 @@ public class ReportActivity extends AppCompatActivity {
         reportId = intent.getLongExtra(EXTRA_REPORT_ID, 0);
         adapter = new ItemListAdapter(this,
                 item -> {
+
                     //TODO: for example, show full screen picture + rotation
+                    Intent picturePreviewIntent = new Intent(this,
+                            PicturePreviewActivity.class);
+                    picturePreviewIntent.putExtra(PicturePreviewActivity.EXTRA_PICTURE_PATH,
+                            item.getPicturePath());
+                    picturePreviewIntent.putExtra(PicturePreviewActivity.EXTRA_ROTATION,
+                            item.getPictureRotation());
+                    startActivity(picturePreviewIntent);
                 },
                 ()->{
                     final Intent intentSelectThread = new Intent(ReportActivity.this,
@@ -218,11 +227,10 @@ public class ReportActivity extends AppCompatActivity {
                         });
             }
         } catch (ExecutionException e) {
-            e.printStackTrace();
+            if(E) Log.e(TAG, "ExecutionException", e);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            if(E) Log.e(TAG, "InterruptedException", e);
         }
-
     }
 
     @Override

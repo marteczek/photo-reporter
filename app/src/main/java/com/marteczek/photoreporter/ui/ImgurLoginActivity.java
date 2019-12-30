@@ -21,6 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.marteczek.photoreporter.application.Settings.Debug.D;
+import static com.marteczek.photoreporter.application.Settings.Debug.E;
 
 public class ImgurLoginActivity extends AppCompatActivity {
     private static final String TAG = "ImgurLoginActivity";
@@ -109,7 +110,7 @@ public class ImgurLoginActivity extends AppCompatActivity {
                         }
                     }
                 } catch (MalformedURLException e) {
-                    e.printStackTrace();
+                    if(E) Log.e(TAG, "MalformedURLException", e);
                 }
             }
         });

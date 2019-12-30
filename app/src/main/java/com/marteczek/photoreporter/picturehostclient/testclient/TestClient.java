@@ -1,13 +1,17 @@
 package com.marteczek.photoreporter.picturehostclient.testclient;
 
+import android.util.Log;
+
 import com.marteczek.photoreporter.picturehostclient.BaseResponse;
 import com.marteczek.photoreporter.picturehostclient.ImageHostClient;
 import com.marteczek.photoreporter.picturehostclient.imgur.ImgurClient;
 import com.marteczek.photoreporter.picturehostclient.imgur.data.PictureMetadata;
 
+import static com.marteczek.photoreporter.application.Settings.Debug.E;
 import static com.marteczek.photoreporter.application.Settings.Debug.TEST_UPLOAD_CLIENT_SIMULATE_ERROR;
 
 public class TestClient implements ImageHostClient {
+    private static final String TAG = "ImageHostClient";
     private BaseResponse response;
 
     public TestClient() {
@@ -35,7 +39,7 @@ public class TestClient implements ImageHostClient {
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            if(E) Log.e(TAG, "InterruptedException", e);
         }
         return response;
     }

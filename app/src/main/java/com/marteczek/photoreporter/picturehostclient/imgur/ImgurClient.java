@@ -30,6 +30,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 import static com.marteczek.photoreporter.application.Settings.Debug.D;
+import static com.marteczek.photoreporter.application.Settings.Debug.E;
 
 public class ImgurClient implements ImageHostClient {
 
@@ -57,7 +58,10 @@ public class ImgurClient implements ImageHostClient {
         private boolean enoughCredits;
 
         @Builder
-        public ImgurResponse(boolean success, boolean canRetry, boolean canContinue, boolean ioException, String albumMetadata, PictureMetadata pictureMetadata, Long rateLimitClientRemaining, Long rateLimitUserRemaining, Date rateLimitUserReset, boolean enoughCredits) {
+        public ImgurResponse(boolean success, boolean canRetry, boolean canContinue,
+                             boolean ioException, String albumMetadata, PictureMetadata pictureMetadata,
+                             Long rateLimitClientRemaining, Long rateLimitUserRemaining,
+                             Date rateLimitUserReset, boolean enoughCredits) {
             super(success, canRetry, canContinue, ioException, albumMetadata, pictureMetadata);
             this.rateLimitClientRemaining = rateLimitClientRemaining;
             this.rateLimitUserRemaining = rateLimitUserRemaining;
@@ -96,19 +100,19 @@ public class ImgurClient implements ImageHostClient {
                 rateLimitClientRemaining = Long.valueOf(
                         response.headers().get("x-ratelimit-clientremaining"));
             } catch (NumberFormatException e) {
-                e.printStackTrace();
+                if(E) Log.e(TAG, "NumberFormatException", e);
             }
             try {
                 rateLimitUserRemaining = Long.valueOf(
                         response.headers().get("x-ratelimit-userremaining"));
             } catch (NumberFormatException e) {
-                e.printStackTrace();
+                if(E) Log.e(TAG, "NumberFormatException", e);
             }
             try {
                 Long userReset = Long.valueOf(response.headers().get("x-ratelimit-userreset"));
                 rateLimitUserReset = new Date(userReset * 1000);
             } catch (NumberFormatException e) {
-                e.printStackTrace();
+                if(E) Log.e(TAG, "NumberFormatException", e);
             }
             if(D) Log.d(TAG, "x-ratelimit-clientremaining: " + rateLimitClientRemaining);
             if(D) Log.d(TAG, "rateLimitUserRemaining: " + rateLimitUserRemaining);
@@ -187,19 +191,19 @@ public class ImgurClient implements ImageHostClient {
                 rateLimitClientRemaining = Long.valueOf(
                         response.headers().get("x-ratelimit-clientremaining"));
             } catch(NumberFormatException e) {
-                e.printStackTrace();
+                if(E) Log.e(TAG, "NumberFormatException", e);
             }
             try {
                 rateLimitUserRemaining = Long.valueOf(
                         response.headers().get("x-ratelimit-userremaining"));
             } catch(NumberFormatException e) {
-                e.printStackTrace();
+                if(E) Log.e(TAG, "NumberFormatException", e);
             }
             try {
                 Long userReset = Long.valueOf(response.headers().get("x-ratelimit-userreset"));
                 rateLimitUserReset = new Date(userReset * 1000);
             } catch(NumberFormatException e) {
-                e.printStackTrace();
+                if(E) Log.e(TAG, "NumberFormatException", e);
             }
             if(D) Log.d(TAG, "x-ratelimit-clientremaining: " + rateLimitClientRemaining);
             if(D) Log.d(TAG, "rateLimitUserRemaining: " + rateLimitUserRemaining);

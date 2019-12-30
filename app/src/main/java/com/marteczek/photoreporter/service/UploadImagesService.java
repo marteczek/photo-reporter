@@ -1,6 +1,7 @@
 package com.marteczek.photoreporter.service;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -26,6 +27,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import static com.marteczek.photoreporter.application.Settings.Debug.D;
+import static com.marteczek.photoreporter.application.Settings.Debug.E;
 
 public class UploadImagesService extends BaseService {
 
@@ -112,8 +114,9 @@ public class UploadImagesService extends BaseService {
             for (Item item : items) {
                 Long itemId = item.getId();
                 String pictureName ="picture-" + item.getSuccession() + ".jpg";
-                String path = pictureManager.rotateAndResizePicture(item.getPicturePath(), pictureName,
+                Bitmap bitmap = pictureManager.preparePictureForUpload(item.getPicturePath(),
                         item.getPictureRotation(), pictureFormat.getGreaterDimension());
+                String path = pictureManager.savePicture(bitmap, pictureName);
                 PictureMetadata pictureMetadata;
                 for (int i = 0; i < 3 ; i++) {
                     response = imageHostClient.uploadImage(path, pictureName, "desc.");
@@ -153,7 +156,7 @@ public class UploadImagesService extends BaseService {
             imageHostClient.disconnect();
             return Response.builder().succeeded(true).build();
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            if(E) Log.e(TAG, "RuntimeException", e);
             return Response.builder().succeeded(false).build();
         }
     }

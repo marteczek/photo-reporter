@@ -39,6 +39,7 @@ import javax.inject.Inject;
 import dagger.android.AndroidInjection;
 
 import static com.marteczek.photoreporter.application.Settings.Debug.D;
+import static com.marteczek.photoreporter.application.Settings.Debug.E;
 
 public class FindThreadActivity extends AppCompatActivity {
     private static final String TAG = "FindThreadActivity";
@@ -47,7 +48,6 @@ public class FindThreadActivity extends AppCompatActivity {
     public static final String EXTRA_THREAD_NAME = "extra_thread_name";
 
     protected static final String TOPICS_REF_PATTERN = "^/topics/(\\d+).*$";
-
     protected static final String TOPICS_QUERY_PATTERN = "(?:^|&)t=(\\d+)(?:$|&)";
 
     private static final String URL = "https://www.skyscrapercity.com/";
@@ -73,7 +73,7 @@ public class FindThreadActivity extends AppCompatActivity {
             try {
                 url += "tags.php?tag=" + URLEncoder.encode(Settings.Build.TagRestriction, "UTF-8") ;
             } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+                if(E) Log.e(TAG, "UnsupportedEncodingException" , e);
             }
         }
         setContentView(R.layout.activity_select_thread);
@@ -131,7 +131,7 @@ public class FindThreadActivity extends AppCompatActivity {
                         return;
                     }
                 } catch (MalformedURLException e) {
-                    e.printStackTrace();
+                    if(E) Log.e(TAG, "MalformedURLException" , e);
                 }
                 threadId = null;
                 threadName = null;
@@ -204,7 +204,7 @@ public class FindThreadActivity extends AppCompatActivity {
                         try {
                             webView.loadUrl(URL + "tags.php?tag=" + URLEncoder.encode(name, "UTF-8"));
                         } catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
+                            if(E) Log.e(TAG, "UnsupportedEncodingException", e);
                         }
                     } else {
                         webView.loadUrl(URL);

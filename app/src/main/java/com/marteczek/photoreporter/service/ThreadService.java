@@ -1,6 +1,7 @@
 package com.marteczek.photoreporter.service;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 
@@ -10,8 +11,11 @@ import com.marteczek.photoreporter.service.baseservice.BaseService;
 
 import java.util.List;
 
+import static com.marteczek.photoreporter.application.Settings.Debug.E;
+
 public class ThreadService extends BaseService {
 
+    private static final String TAG = "BaseService";
     private ThreadDao threadDao;
 
     public ThreadService(Application application, ThreadDao threadDao) {
@@ -38,7 +42,7 @@ public class ThreadService extends BaseService {
                     threadDao.updateLastUsageByThreadId(threadId, thread.getLastUsage());
                 }
             } catch (RuntimeException e) {
-                e.printStackTrace();
+                if(E) Log.e(TAG, "RuntimeException", e);
                 if (onErrorListener != null) {
                     onErrorListener.onError(e);
                 }

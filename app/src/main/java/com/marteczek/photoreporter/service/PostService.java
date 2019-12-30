@@ -18,6 +18,7 @@ import com.marteczek.photoreporter.service.baseservice.BaseService;
 import java.util.List;
 
 import static com.marteczek.photoreporter.application.Settings.Debug.D;
+import static com.marteczek.photoreporter.application.Settings.Debug.E;
 
 public class PostService extends BaseService {
     private static final String TAG = "PostService";
@@ -98,7 +99,7 @@ public class PostService extends BaseService {
                 }
                 reportDao.updateStatusById(reportId, ReportStatus.POST_CREATED);
             } catch (RuntimeException e) {
-                e.printStackTrace();
+                if(E) Log.e(TAG, "RuntimeException", e);
                 if (onErrorListener != null) {
                     onErrorListener.onError(e);
                 }

@@ -3,6 +3,7 @@ package com.marteczek.photoreporter.service;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 
@@ -19,7 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.marteczek.photoreporter.application.Settings.Debug.E;
+
 public class ItemService extends BaseService {
+
+    private static final String TAG = "BaseService";
 
     private final PictureManager pictureManager;
     private final ItemDao itemDao;
@@ -52,7 +57,7 @@ public class ItemService extends BaseService {
                 itemDao.updateThumbnailPathById(item.getId(), thumbnailPath);
             }
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            if(E) Log.e(TAG, "RuntimeException", e);
             if (onErrorListener != null) {
                 onErrorListener.onError(e);
             }
@@ -82,7 +87,7 @@ public class ItemService extends BaseService {
                 }
             });
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            if(E) Log.e(TAG, "RuntimeException", e);
             if (onErrorListener != null) {
                 onErrorListener.onError(e);
             }

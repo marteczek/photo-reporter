@@ -1,6 +1,5 @@
 package com.marteczek.photoreporter.ui;
 
-import android.app.Application;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -64,9 +63,6 @@ public class ReportListActivity extends AppCompatActivity {
     private ReportListViewModel viewModel;
 
     private String newReportName;
-
-    @Inject
-    Application application;
 
     @Inject
     ViewModelFactory viewModelFactory;

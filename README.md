@@ -1,6 +1,6 @@
 # Photo Reporter
 
-This is an Adnroid application for publishing posts with lots of pictures on www.skyscrapercity.com.
+This is an Android application for publishing posts with lots of pictures on www.skyscrapercity.com.
 
 ### Requirements
 
@@ -10,6 +10,6 @@ This is an Adnroid application for publishing posts with lots of pictures on www
 
 ###  Legal notice
 
-© 2019 Mariusz Szczepanik
+ï¿½ 2019 Mariusz Szczepanik
 
 License GPL v3
