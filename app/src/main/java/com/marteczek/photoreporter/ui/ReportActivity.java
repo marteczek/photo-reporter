@@ -6,6 +6,8 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.documentfile.provider.DocumentFile;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,6 +20,8 @@ import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -34,9 +38,12 @@ import com.marteczek.photoreporter.application.configuration.viewmodelfactory.Vi
 import com.marteczek.photoreporter.database.entity.Item;
 import com.marteczek.photoreporter.database.entity.Report;
 import com.marteczek.photoreporter.database.entity.type.ReportStatus;
+import com.marteczek.photoreporter.service.data.PictureItem;
 import com.marteczek.photoreporter.ui.misc.ItemTouchHelperAdapter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +54,8 @@ import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static com.marteczek.photoreporter.application.Settings.Debug.D;
 import static com.marteczek.photoreporter.application.Settings.Debug.E;
 import static java.lang.Math.round;
@@ -58,6 +67,8 @@ public class ReportActivity extends AppCompatActivity {
     public static final String EXTRA_REPORT_ID = "extra_report_id";
 
     private static final int SELECT_THREAD_REQUEST_CODE = 1;
+    private static final int SELECT_PICTURES_REQUEST_CODE = 2;
+    private static final int READ_EXTERNAL_STORAGE_REQUEST_CODE = 3;
 
     private ReportViewModel viewModel;
 
@@ -247,6 +258,7 @@ public class ReportActivity extends AppCompatActivity {
     }
 
     private void configureMenu() {
+        boolean addPicturesEnabled = report != null && ReportStatus.NEW.equals(report.getStatus());
         boolean uploadPicturesEnabled = report != null
                 && (ReportStatus.NEW.equals(report.getStatus())
                     || ReportStatus.PICTURE_SENDING_FAILURE.equals(report.getStatus())
@@ -260,6 +272,7 @@ public class ReportActivity extends AppCompatActivity {
                 && Arrays.asList(ReportStatus.POST_CREATED, ReportStatus.PUBLISHED)
                 .contains(report.getStatus());
         if (menu != null) {
+            menu.findItem(R.id.action_add_pictures).setEnabled(addPicturesEnabled);
             menu.findItem(R.id.action_upload_pictures).setEnabled(uploadPicturesEnabled);
             menu.findItem(R.id.action_create_post).setEnabled(createPostEnabled);
             menu.findItem(R.id.action_open_post).setEnabled(openPostEnabled);
@@ -270,6 +283,16 @@ public class ReportActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
+            case R.id.action_add_pictures:
+                saveChanges();
+                if (ActivityCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE)
+                        == PERMISSION_GRANTED) {
+                    selectPictures();
+                } else
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{READ_EXTERNAL_STORAGE},
+                            READ_EXTERNAL_STORAGE_REQUEST_CODE);
+                return true;
             case R.id.action_upload_pictures:
                 saveChanges();
                 viewModel.uploadPictures(reportId)
@@ -293,35 +316,78 @@ public class ReportActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void updateProgress(WorkInfo workInfo) {
-        ProgressBar progressBar = findViewById(R.id.progressBar);
-        Data progress = workInfo.getProgress();
-        int current = progress.getInt(UploadWorker.DATA_PROGRESS, 0);
-        int max = progress.getInt(UploadWorker.DATA_MAX_PROGRESS, 0);
-        progressBar.setMax(max);
-        progressBar.setProgress(current);
-        if (WorkInfo.State.RUNNING.equals(workInfo.getState())) {
-            progressBar.setVisibility(View.VISIBLE);
-        } else {
-            invalidateOptionsMenu();
-            progressBar.setVisibility(View.GONE);
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == READ_EXTERNAL_STORAGE_REQUEST_CODE && grantResults.length > 0
+                && grantResults[0] == PERMISSION_GRANTED) {
+            selectPictures();
         }
-        uploadWorkerState = workInfo.getState();
-        if(D) Log.d(TAG, "Work info: " + uploadWorkerState + ", progress" + current + "/" + max);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == SELECT_THREAD_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
-            newThreadId = data.getExtras().getString(ThreadListActivity.EXTRA_THREAD_ID);
-            String threadName = data.getExtras().getString(ThreadListActivity.EXTRA_THREAD_NAME);
-            if (!TextUtils.isEmpty((threadName))) {
-                adapter.setThreadName(threadName);
-            } else {
-                adapter.setThreadName(newThreadId);
+        if (resultCode == RESULT_OK && data != null) {
+            switch (requestCode) {
+                case SELECT_THREAD_REQUEST_CODE:
+                    onThreadSelected(data);
+                    break;
+                case SELECT_PICTURES_REQUEST_CODE:
+                    onPicturesSelected(data);
+                    break;
             }
         }
+    }
+
+    private void onThreadSelected(@NonNull Intent data) {
+        newThreadId = data.getExtras().getString(ThreadListActivity.EXTRA_THREAD_ID);
+        String threadName = data.getExtras().getString(ThreadListActivity.EXTRA_THREAD_NAME);
+        if (!TextUtils.isEmpty((threadName))) {
+            adapter.setThreadName(threadName);
+        } else {
+            adapter.setThreadName(newThreadId);
+        }
+    }
+
+    private void selectPictures() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        }
+        startActivityForResult(Intent.createChooser(intent,
+                getResources().getString(R.string.select_pictures)), SELECT_PICTURES_REQUEST_CODE);
+    }
+
+    private void onPicturesSelected(@NonNull Intent data) {
+        List<PictureItem> listOfPictures = new ArrayList<>();
+        if (data.getClipData() != null) {
+            int count = data.getClipData().getItemCount();
+            for (int i = 0; i < count; i++) {
+                Uri uri = data.getClipData().getItemAt(i).getUri();
+                DocumentFile documentFile = DocumentFile.fromSingleUri(this, uri);
+                Date lastModified = null;
+                if (documentFile != null) {
+                    lastModified = new Date(documentFile.lastModified());
+                }
+                PictureItem pictureItem = PictureItem.builder().pictureUri(uri)
+                        .lastModified(lastModified).build();
+                listOfPictures.add(pictureItem);
+            }
+        } else if (data.getData() != null) {
+            Uri uri = data.getData();
+            DocumentFile documentFile = DocumentFile.fromSingleUri(this, uri);
+            Date lastModified = null;
+            if (documentFile != null) {
+                lastModified = new Date(documentFile.lastModified());
+            }
+            PictureItem pictureItem = PictureItem.builder().pictureUri(uri)
+                    .lastModified(lastModified).build();
+            listOfPictures.add(pictureItem);
+        }
+        viewModel.addItems(reportId, listOfPictures);
     }
 
     @Override
@@ -368,4 +434,22 @@ public class ReportActivity extends AppCompatActivity {
             adapter.setThreadName("");
         }
     }
+
+    private void updateProgress(WorkInfo workInfo) {
+        ProgressBar progressBar = findViewById(R.id.progressBar);
+        Data progress = workInfo.getProgress();
+        int current = progress.getInt(UploadWorker.DATA_PROGRESS, 0);
+        int max = progress.getInt(UploadWorker.DATA_MAX_PROGRESS, 0);
+        progressBar.setMax(max);
+        progressBar.setProgress(current);
+        if (WorkInfo.State.RUNNING.equals(workInfo.getState())) {
+            progressBar.setVisibility(View.VISIBLE);
+        } else {
+            invalidateOptionsMenu();
+            progressBar.setVisibility(View.GONE);
+        }
+        uploadWorkerState = workInfo.getState();
+        if(D) Log.d(TAG, "Work info: " + uploadWorkerState + ", progress" + current + "/" + max);
+    }
+
 }

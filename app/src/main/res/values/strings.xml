@@ -93,4 +93,5 @@
     <string name="title_fragment_settings_watermark">Settings (watermark)</string>
     <string name="preference_watermark_position_title">Position</string>
     <string name="preference_apply_watermark_title">Apply watermark</string>
+    <string name="action_add_pictures">Add pictures</string>
 </resources>

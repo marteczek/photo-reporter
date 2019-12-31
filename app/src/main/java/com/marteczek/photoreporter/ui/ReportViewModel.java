@@ -14,6 +14,7 @@ import androidx.work.WorkManager;
 
 import com.marteczek.photoreporter.R;
 import com.marteczek.photoreporter.application.Settings;
+import com.marteczek.photoreporter.application.background.ThumbnailWorker;
 import com.marteczek.photoreporter.application.background.UploadWorker;
 import com.marteczek.photoreporter.database.entity.ForumThread;
 import com.marteczek.photoreporter.database.entity.Item;
@@ -22,6 +23,7 @@ import com.marteczek.photoreporter.service.ItemService;
 import com.marteczek.photoreporter.service.PostService;
 import com.marteczek.photoreporter.service.ReportService;
 import com.marteczek.photoreporter.service.ThreadService;
+import com.marteczek.photoreporter.service.data.PictureItem;
 
 import java.util.List;
 import java.util.Map;
@@ -96,6 +98,22 @@ public class ReportViewModel extends AndroidViewModel {
     void updateItems(Map<Long, String> headerChanges, Set<Long> removedItems,
                             List<Long> order) {
         itemService.updateItems(headerChanges, removedItems, order,
+                e -> Toast.makeText(getApplication(), R.string.database_error, Toast.LENGTH_LONG).show());
+    }
+
+    void addItems(Long reportId, List<PictureItem> listOfPictures) {
+        reportService.insertItemsToReport(reportId, listOfPictures,
+                Settings.getThumbnailDimension(getApplication()),
+                repId -> {
+                    Data data = new Data.Builder()
+                            .putLong(ThumbnailWorker.DATA_REPORT_ID, repId)
+                            .build();
+                    OneTimeWorkRequest thumbnailWorkRequest =
+                            new OneTimeWorkRequest.Builder(ThumbnailWorker.class)
+                                    .setInputData(data)
+                                    .build();
+                    WorkManager.getInstance(getApplication()).enqueueUniqueWork(ThumbnailWorker.NAME,
+                            ExistingWorkPolicy.REPLACE, thumbnailWorkRequest);},
                 e -> Toast.makeText(getApplication(), R.string.database_error, Toast.LENGTH_LONG).show());
     }
 }

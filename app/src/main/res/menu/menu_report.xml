@@ -3,6 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.marteczek.photoreporter.ui.ReportListActivity">
     <item
+        android:id="@+id/action_add_pictures"
+        android:title="@string/action_add_pictures"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_upload_pictures"
         android:title="@string/action_upload_pictures"
         app:showAsAction="never" />

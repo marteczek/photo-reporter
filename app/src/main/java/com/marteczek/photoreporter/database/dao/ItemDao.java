@@ -37,11 +37,17 @@ public interface ItemDao {
     @Query("SELECT * FROM items WHERE id_report = :reportId ORDER BY succession")
     List<Item> findByReportIdOrderBySuccession(Long reportId);
 
+    @Query("SELECT * FROM items WHERE id_report = :reportId AND picture_uri = :pictureUri")
+    List<Item> findByReportIdAndPictureUri(Long reportId, String pictureUri);
+
     @Query("SELECT * FROM items WHERE id_report = :reportId AND thumbnail_path IS NULL")
     List<Item> findByReportIdAndThumbnailPathIsNull(Long reportId);
 
     @Query("SELECT * FROM items WHERE id_report = :reportId ORDER BY succession")
     LiveData<List<Item>> findByReportIdOrderBySuccessionAsync(Long reportId);
+
+    @Query("SELECT MAX(succession) FROM items WHERE id_report = :reportId")
+    Long findMaxSuccessionByReportId(Long reportId);
 
     @Query("UPDATE items SET header = :header WHERE id = :id")
     void updateHeaderById(Long id, String header);
