@@ -102,8 +102,9 @@ class ViewModelModule {
     @Provides
     @IntoMap
     @ViewModelKey(ThreadListViewModel.class)
-    ViewModel threadListViewModel(Application application, ThreadService threadService) {
-        return new ThreadListViewModel(application, threadService);
+    ViewModel threadListViewModel(Application application, ThreadService threadService,
+                                  ReportService reportService) {
+        return new ThreadListViewModel(application, threadService, reportService);
     }
 }
 

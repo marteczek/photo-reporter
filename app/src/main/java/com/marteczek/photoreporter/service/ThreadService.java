@@ -5,6 +5,7 @@ import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 
+import com.marteczek.photoreporter.database.ReportDatabase;
 import com.marteczek.photoreporter.database.dao.ThreadDao;
 import com.marteczek.photoreporter.database.entity.ForumThread;
 import com.marteczek.photoreporter.service.baseservice.BaseService;
@@ -48,5 +49,9 @@ public class ThreadService extends BaseService {
                 }
             }
         });
+    }
+
+    public void deleteThread(String threadId) {
+        ReportDatabase.databaseWriteExecutor.execute(() -> threadDao.deleteByThreadId(threadId));
     }
 }

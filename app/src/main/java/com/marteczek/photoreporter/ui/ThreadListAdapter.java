@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.marteczek.photoreporter.R;
@@ -15,7 +16,19 @@ import com.marteczek.photoreporter.database.entity.ForumThread;
 
 import java.util.List;
 
-public class ThreadListAdapter extends RecyclerView.Adapter<ThreadListAdapter.ThreadViewHolder>{
+import static androidx.recyclerview.widget.ItemTouchHelper.Callback.makeMovementFlags;
+
+public class ThreadListAdapter extends RecyclerView.Adapter<ThreadListAdapter.ThreadViewHolder>
+        implements ThreadListActivity.ItemTouchHelperAdapter {
+
+    private final LayoutInflater inflater;
+
+    private List<ForumThread> threads;
+
+    private List<String> threadsIdsInReports;
+
+    private final OnClickListener onClickListener;
+
 
     class ThreadViewHolder extends RecyclerView.ViewHolder {
         private final TextView nameTextView;
@@ -29,12 +42,6 @@ public class ThreadListAdapter extends RecyclerView.Adapter<ThreadListAdapter.Th
     public interface OnClickListener {
         void onClick(ForumThread thread);
     }
-
-    private final LayoutInflater inflater;
-
-    private List<ForumThread> threads;
-
-    private final OnClickListener onClickListener;
 
     ThreadListAdapter(Context context, OnClickListener onClickListener) {
         this.onClickListener = onClickListener;
@@ -67,8 +74,32 @@ public class ThreadListAdapter extends RecyclerView.Adapter<ThreadListAdapter.Th
         notifyDataSetChanged();
     }
 
+    void setThreadsIdsInReports(List<String> threadsIds) {
+        this.threadsIdsInReports = threadsIds;
+    }
+
     @Override
     public int getItemCount() {
         return (threads != null) ? threads.size() : 0;
+    }
+
+
+    @Override
+    public int getMovementFlags(int position) {
+        if (threads != null && threadsIdsInReports != null
+                && !threadsIdsInReports.contains(threads.get(position).getThreadId())) {
+            return makeMovementFlags(0, ItemTouchHelper.END);
+        }
+        return 0;
+    }
+
+    @Override
+    public String onItemDismiss(int position) {
+        String  threadId = null;
+        if (threads != null) {
+            threadId = threads.get(position).getThreadId();
+            threads.remove(position);
+        }
+        return threadId;
     }
 }

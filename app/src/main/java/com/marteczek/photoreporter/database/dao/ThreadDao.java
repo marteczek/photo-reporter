@@ -18,7 +18,7 @@ public interface ThreadDao {
     Long insert(ForumThread thread);
 
     @Query("DELETE FROM threads WHERE thread_id = :threadId")
-    void deleteByThreadId(Long threadId);
+    void deleteByThreadId(String threadId);
 
     @Query("SELECT * FROM threads WHERE thread_id = :threadId")
     ForumThread findByThreadId(String threadId);

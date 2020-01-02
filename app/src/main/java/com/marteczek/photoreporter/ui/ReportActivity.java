@@ -8,6 +8,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.documentfile.provider.DocumentFile;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -35,6 +36,7 @@ import android.widget.Toast;
 import com.marteczek.photoreporter.R;
 import com.marteczek.photoreporter.application.background.UploadWorker;
 import com.marteczek.photoreporter.application.configuration.viewmodelfactory.ViewModelFactory;
+import com.marteczek.photoreporter.database.entity.ForumThread;
 import com.marteczek.photoreporter.database.entity.Item;
 import com.marteczek.photoreporter.database.entity.Report;
 import com.marteczek.photoreporter.database.entity.type.ReportStatus;
@@ -81,6 +83,8 @@ public class ReportActivity extends AppCompatActivity {
     private long reportId;
 
     private Report report;
+
+    private LiveData<ForumThread> threadLiveData;
 
     private WorkInfo.State uploadWorkerState;
 
@@ -395,6 +399,7 @@ public class ReportActivity extends AppCompatActivity {
         super.onStop();
         saveChanges();
     }
+
     private void saveChanges() {
         if (adapter.getNewReportName() != null) {
             viewModel.updateReportName(reportId, adapter.getNewReportName());
@@ -422,8 +427,13 @@ public class ReportActivity extends AppCompatActivity {
     }
 
     private void updateThreadName(String threadId) {
+        if(D) Log.d(TAG, "updateThreadName. threadId: " + threadId);
         if(threadId != null) {
-            viewModel.findThreadByThreadId(threadId).observe(this, thread -> {
+            if (threadLiveData != null) {
+                threadLiveData.removeObservers(this);
+            }
+            threadLiveData = viewModel.findThreadByThreadId(threadId);
+            threadLiveData.observe(this, thread -> {
                 if (!TextUtils.isEmpty(thread.getName())) {
                     adapter.setThreadName(thread.getName());
                 } else {
@@ -451,5 +461,4 @@ public class ReportActivity extends AppCompatActivity {
         uploadWorkerState = workInfo.getState();
         if(D) Log.d(TAG, "Work info: " + uploadWorkerState + ", progress" + current + "/" + max);
     }
-
 }

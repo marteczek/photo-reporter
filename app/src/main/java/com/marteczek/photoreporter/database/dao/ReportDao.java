@@ -21,6 +21,9 @@ public interface ReportDao {
     @Query("DELETE FROM reports")
     void deleteAll();
 
+    @Query("SELECT * FROM reports")
+    LiveData<List<Report>> findAllAsync();
+
     @Query("SELECT * FROM reports ORDER BY date DESC")
     LiveData<List<Report>> findAllOrderByDateDescAsync();
 
@@ -29,6 +32,9 @@ public interface ReportDao {
 
     @Query("SELECT * FROM reports WHERE id = :id")
     LiveData<Report> findByIdAsync(Long id);
+
+    @Query("SELECT DISTINCT thread_id FROM reports")
+    LiveData<List<String>> findThreadsIds();
 
     @Query("UPDATE reports SET host_metadata = :metadata WHERE id = :id")
     void updateHostMetadataById(Long id, String metadata);

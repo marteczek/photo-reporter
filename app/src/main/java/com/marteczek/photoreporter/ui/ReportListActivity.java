@@ -54,6 +54,7 @@ import static com.marteczek.photoreporter.application.Settings.Debug.D;
 import static java.lang.Math.round;
 
 public class ReportListActivity extends AppCompatActivity {
+    private static final String TAG = "ReportListActivity";
 
     private static final int CHOOSE_PICTURES_REQUEST_CODE = 1;
     private static final int READ_EXTERNAL_STORAGE_REQUEST_CODE = 2;
@@ -121,7 +122,7 @@ public class ReportListActivity extends AppCompatActivity {
                     alpha = 1f - Math.abs(dX) / (float) viewHolder.itemView.getWidth();
                 }
                 viewHolder.itemView.setAlpha(alpha);
-                if(D) Log.d("XXX", "."+ actionState +"." + isCurrentlyActive + "." + dX + ".");
+                if(D) Log.d(TAG, "."+ actionState +"." + isCurrentlyActive + "." + dX + ".");
             }
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
         }

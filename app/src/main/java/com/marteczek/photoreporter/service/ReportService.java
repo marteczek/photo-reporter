@@ -59,6 +59,10 @@ public class ReportService extends BaseService {
         return reportDao.findAllOrderByDateDescAsync();
     }
 
+    public  LiveData<List<String>> findThreadsIds() {
+        return reportDao.findThreadsIds();
+    }
+
     public void insertItemsToReport(final Long reportId,
                                     final List<PictureItem> listOfPictures,
                                     final int thumbnailDimension,
