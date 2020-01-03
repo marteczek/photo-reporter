@@ -10,8 +10,6 @@ import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.marteczek.photoreporter.R;
-import com.marteczek.photoreporter.application.Settings;
-import com.marteczek.photoreporter.application.data.ImgurUserData;
 import com.marteczek.photoreporter.application.configuration.viewmodelfactory.ViewModelFactory;
 import com.marteczek.photoreporter.database.entity.Report;
 import com.marteczek.photoreporter.service.data.PictureItem;
@@ -158,11 +156,6 @@ public class ReportListActivity extends AppCompatActivity {
         ItemTouchHelper.Callback callback = new ReportListActivity.ItemTouchHelperCallback(adapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(recyclerView);
-
-        ImgurUserData userData = Settings.getImgurUserData(this);
-        if (userData == null) {
-            Toast.makeText(this,R.string.please_log_in_to_upload, Toast.LENGTH_LONG).show();
-        }
     }
 
     @Override

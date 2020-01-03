@@ -7,20 +7,18 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.marteczek.photoreporter.application.Settings;
-import com.marteczek.photoreporter.picturehostclient.ImageHostClient;
+import com.marteczek.photoreporter.application.data.ImgurUserData;
 import com.marteczek.photoreporter.picturehostclient.BaseResponse;
-import com.marteczek.photoreporter.picturehostclient.imgur.dto.Album;
-import com.marteczek.photoreporter.picturehostclient.imgur.dto.Answer;
-import com.marteczek.photoreporter.picturehostclient.imgur.dto.Picture;
 import com.marteczek.photoreporter.picturehostclient.imgur.data.PictureMetadata;
+import com.marteczek.photoreporter.picturehostclient.imgur.dto.Answer;
+import com.marteczek.photoreporter.picturehostclient.imgur.dto.Credits;
+import com.marteczek.photoreporter.picturehostclient.imgur.dto.Picture;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Date;
 
-import lombok.Builder;
-import lombok.Getter;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -32,49 +30,31 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 import static com.marteczek.photoreporter.application.Settings.Debug.D;
 import static com.marteczek.photoreporter.application.Settings.Debug.E;
 
-public class ImgurClient implements ImageHostClient {
+abstract class ImgurAbstractClient {
 
-    private static final String TAG = "ImgurClient";
+    private static final String TAG = "ImgurAbstractClient";
 
     private static final String BASE_URL = "https://api.imgur.com/3/";
 
     private static final int RESERVED_CREDITS = 500;
 
-    private final ImgurApi imgurAPI;
+    final ImgurApi imgurAPI;
 
-    private final Gson gson;
+    final Gson gson;
 
-    private final String restClientId;
+    final String restClientId;
 
-    private final String restAccessToken;
+    final String restAccessToken;
 
-    private String albumId;
-
-    @Getter
-    public static class ImgurResponse extends BaseResponse {
-        private Long rateLimitClientRemaining;
-        private Long rateLimitUserRemaining;
-        private Date rateLimitUserReset;
-        private boolean enoughCredits;
-
-        @Builder
-        public ImgurResponse(boolean success, boolean canRetry, boolean canContinue,
-                             boolean ioException, String albumMetadata, PictureMetadata pictureMetadata,
-                             Long rateLimitClientRemaining, Long rateLimitUserRemaining,
-                             Date rateLimitUserReset, boolean enoughCredits) {
-            super(success, canRetry, canContinue, ioException, albumMetadata, pictureMetadata);
-            this.rateLimitClientRemaining = rateLimitClientRemaining;
-            this.rateLimitUserRemaining = rateLimitUserRemaining;
-            this.rateLimitUserReset = rateLimitUserReset;
-            this.enoughCredits = enoughCredits;
-        }
-    }
-
-    public ImgurClient(Context context) {
+    ImgurAbstractClient(Context context) {
         String clientId = Settings.getClientId(context);
-        String accessToken = Settings.getImgurUserData(context).getAccessToken();
         restClientId = "Client-ID " + clientId;
-        restAccessToken = "Bearer " + accessToken;
+        ImgurUserData imgurUserData = Settings.getImgurUserData(context);
+        if (imgurUserData != null) {
+            restAccessToken = "Bearer " + imgurUserData.getAccessToken();
+        } else {
+            restAccessToken = null;
+        }
         imgurAPI = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(ScalarsConverterFactory.create())
@@ -83,9 +63,8 @@ public class ImgurClient implements ImageHostClient {
         gson = new GsonBuilder().create();
     }
 
-    @Override
-    public BaseResponse connect(int pictureCount)  {
-        Call<String> call = imgurAPI.getAccountSettings(restAccessToken);
+    BaseResponse checkCredits(int pictureCount) {
+        Call<String> call = imgurAPI.getCredits(restClientId);
         Response<String> response;
         try {
             response = call.execute();
@@ -93,30 +72,32 @@ public class ImgurClient implements ImageHostClient {
             return ImgurResponse.builder().success(false).ioException(true).canRetry(true).build();
         }
         if (response.isSuccessful()) {
-            Long rateLimitClientRemaining = null;
-            Long rateLimitUserRemaining = null;
+            Type creditsType = new TypeToken<Answer<Credits>>() {}.getType();
+            Credits credits;
+            Answer<Credits> answer = gson.fromJson(response.body(), creditsType);
+            if(answer == null || answer.getData() == null){
+                if(E) Log.e(TAG, "fromJson returned null data");
+                return ImgurResponse.builder()
+                        .success(false)
+                        .canRetry(false)
+                        .canContinue(false)
+                        .enoughCredits(false)
+                        .build();
+            }
+            credits = answer.getData();
+            Long rateLimitClientRemaining = credits.getClientRemaining();
+            Long rateLimitUserRemaining = credits.getUserRemaining();
             Date rateLimitUserReset = null;
             try {
-                rateLimitClientRemaining = Long.valueOf(
-                        response.headers().get("x-ratelimit-clientremaining"));
+                if(credits.getUserReset() != null) {
+                    rateLimitUserReset = new Date(credits.getUserReset() * 1000);
+                }
             } catch (NumberFormatException e) {
                 if(E) Log.e(TAG, "NumberFormatException", e);
             }
-            try {
-                rateLimitUserRemaining = Long.valueOf(
-                        response.headers().get("x-ratelimit-userremaining"));
-            } catch (NumberFormatException e) {
-                if(E) Log.e(TAG, "NumberFormatException", e);
-            }
-            try {
-                Long userReset = Long.valueOf(response.headers().get("x-ratelimit-userreset"));
-                rateLimitUserReset = new Date(userReset * 1000);
-            } catch (NumberFormatException e) {
-                if(E) Log.e(TAG, "NumberFormatException", e);
-            }
-            if(D) Log.d(TAG, "x-ratelimit-clientremaining: " + rateLimitClientRemaining);
-            if(D) Log.d(TAG, "rateLimitUserRemaining: " + rateLimitUserRemaining);
-            if(D) Log.d(TAG, "rateLimitUserReset: " + rateLimitUserReset);
+            if(D) Log.d(TAG, "rate limit: clientremaining: " + rateLimitClientRemaining);
+            if(D) Log.d(TAG, "rate limit: UserRemaining: " + rateLimitUserRemaining);
+            if(D) Log.d(TAG, "rate limit: UserReset: " + rateLimitUserReset);
             boolean enoughCredits = rateLimitClientRemaining != null
                     && rateLimitClientRemaining > (pictureCount * 10) + RESERVED_CREDITS;
             boolean success = response.isSuccessful()
@@ -137,42 +118,16 @@ public class ImgurClient implements ImageHostClient {
                 .build();
     }
 
-    @Override
-    public BaseResponse createAlbum(String title, String description) {
-        Call<String> call = imgurAPI.createAlbum(restAccessToken, title, description);
-        Response<String> response;
-        try {
-            response = call.execute();
-        } catch (IOException e) {
-            return ImgurResponse.builder()
-                    .success(false)
-                    .canContinue(false)
-                    .canRetry(true)
-                    .build();
-        }
-        if (response.isSuccessful()) {
-            Type albumType = new TypeToken<Answer<Album>>() {}.getType();
-            Answer<Album> album = gson.fromJson(response.body(), albumType);
-            albumId = album.getData().getId();
-            return ImgurResponse.builder()
-                    .success(true)
-                    .canContinue(true)
-                    .albumMetadata(gson.toJson(album.getData()))
-                    .build();
-        }
-        return ImgurResponse.builder()
-                .success(false)
-                .canRetry(false)
-                .canContinue(false)
-                .build();
-    }
-
-    @Override
-    public BaseResponse uploadImage(String path, String title, String description){
+    BaseResponse uploadImage(String path, String title, String description, String albumId){
         File file = new File(path);
         RequestBody fileReqBody = RequestBody.create(MediaType.parse("image/*"), file);
         MultipartBody.Part part = MultipartBody.Part.createFormData("image", file.getName(), fileReqBody);
-        Call<String> call = imgurAPI.uploadImage(restAccessToken, part,  title, description, albumId);
+        Call<String> call;
+        if (albumId == null) {
+            call = imgurAPI.uploadImage(restClientId, part,  title, description);
+        } else {
+            call = imgurAPI.uploadImageToAlbum(restAccessToken, part,  title, description, albumId);
+        }
         Response<String> response;
         try {
             response = call.execute();
@@ -221,14 +176,6 @@ public class ImgurClient implements ImageHostClient {
                 .success(false)
                 .canContinue(false)
                 .canRetry(false)
-                .build();
-    }
-
-    @Override
-    public BaseResponse disconnect() {
-        return ImgurResponse.builder()
-                .success(true)
-                .canContinue(true)
                 .build();
     }
 }

@@ -4,7 +4,7 @@ import android.util.Log;
 
 import com.marteczek.photoreporter.picturehostclient.BaseResponse;
 import com.marteczek.photoreporter.picturehostclient.ImageHostClient;
-import com.marteczek.photoreporter.picturehostclient.imgur.ImgurClient;
+import com.marteczek.photoreporter.picturehostclient.imgur.ImgurResponse;
 import com.marteczek.photoreporter.picturehostclient.imgur.data.PictureMetadata;
 
 import static com.marteczek.photoreporter.application.Settings.Debug.E;
@@ -16,11 +16,11 @@ public class TestClient implements ImageHostClient {
 
     public TestClient() {
         if (TEST_UPLOAD_CLIENT_SIMULATE_ERROR) {
-            response = new ImgurClient.ImgurResponse(true, false, true, false, "",
-                    PictureMetadata.builder().link("link").build(), 0L,0L,null, true);
+            response = new ImgurResponse(true, false, false, false, "",
+                    PictureMetadata.builder().link("link").build(), 0L,0L,null, true, true);
         } else {
-            response = new BaseResponse(true, false, true, false, "",
-                    PictureMetadata.builder().link("").build());
+            response = new ImgurResponse(true, false, true, false, "",
+                    PictureMetadata.builder().link("link").build(), 0L,0L,null, true, true);
         }
     }
 

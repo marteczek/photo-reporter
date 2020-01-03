@@ -37,10 +37,12 @@
 
     <string-array name="preference_picture_host_entries">
         <item>@string/preference_imgur_account</item>
+        <item>@string/preference_imgur_anonymous</item>
     </string-array>
 
     <string-array name="preference_picture_host_values" >
         <item>imgur_account</item>
+        <item>imgur_anonymous</item>
     </string-array>
 
     <string-array name="preference_pictures_per_post_entries" >
@@ -85,4 +87,5 @@
         <item>@string/preference_bottom_right</item>
     </string-array>
 
+    <string name="preference_imgur_anonymous">Imgur (anonymous)</string>
 </resources>

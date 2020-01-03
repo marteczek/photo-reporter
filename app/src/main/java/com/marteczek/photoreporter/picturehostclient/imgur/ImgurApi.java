@@ -9,13 +9,11 @@ import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
-import retrofit2.http.Path;
 
 public interface ImgurApi {
 
-    @GET("account/{userId}")
-    Call<String> getAccountBase(@Header("Authorization") String clientId,
-                                @Path("userId") String userId);
+    @GET("credits")
+    Call<String> getCredits(@Header("Authorization") String clientId);
 
     @GET("account/me/settings")
     Call<String> getAccountSettings(@Header("Authorization") String accessToken);
@@ -27,10 +25,17 @@ public interface ImgurApi {
 
     @Multipart
     @POST("upload")
-    Call<String> uploadImage(@Header("Authorization") String accessToken,
+    Call<String> uploadImage(@Header("Authorization") String clientId,
                              @Part() MultipartBody.Part image,
                              @Part("title") String title,
-                             @Part("description") String description,
-                             @Part("album") String album);
+                             @Part("description") String description);
+
+    @Multipart
+    @POST("upload")
+    Call<String> uploadImageToAlbum(@Header("Authorization") String accessToken,
+                                    @Part() MultipartBody.Part image,
+                                    @Part("title") String title,
+                                    @Part("description") String description,
+                                    @Part("album") String album);
 
 }
