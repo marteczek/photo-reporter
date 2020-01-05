@@ -10,7 +10,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Album {
-    //Sample {"data":{"id":"IrBbLW7","deletehash":"mawZdBD3rz2VEDQ"},"success":true,"status":200}
     String id;
     String deletehash;
 }

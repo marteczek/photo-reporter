@@ -1,17 +1,14 @@
 package com.marteczek.photoreporter.service;
 
 import android.annotation.SuppressLint;
-import android.app.Application;
-import android.content.Context;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 
+import com.marteczek.photoreporter.database.ReportDatabaseHelper;
 import com.marteczek.photoreporter.database.dao.ItemDao;
 import com.marteczek.photoreporter.database.entity.Item;
 import com.marteczek.photoreporter.picturemanager.PictureManager;
-import com.marteczek.photoreporter.picturemanager.PictureManagerImpl;
-import com.marteczek.photoreporter.service.baseservice.BaseService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,21 +19,20 @@ import java.util.Set;
 
 import static com.marteczek.photoreporter.application.Settings.Debug.E;
 
-public class ItemService extends BaseService {
+public class ItemService {
 
     private static final String TAG = "BaseService";
 
+    private final ReportDatabaseHelper dbHelper;
+
     private final PictureManager pictureManager;
+
     private final ItemDao itemDao;
 
-    public ItemService(final Context context) {
-        super(context);
-        itemDao = db.itemDao();
-        pictureManager = new PictureManagerImpl(context);
-    }
 
-    public ItemService(Application application, ItemDao itemDao, PictureManager pictureManager) {
-        super(application.getApplicationContext());
+    public ItemService(ItemDao itemDao, PictureManager pictureManager,
+                       ReportDatabaseHelper reportDatabaseHelper) {
+        this.dbHelper = reportDatabaseHelper;
         this.itemDao = itemDao;
         this.pictureManager = pictureManager;
     }
@@ -68,10 +64,11 @@ public class ItemService extends BaseService {
                             List<Long> order, OnErrorListener onErrorListener) {
         try {
             @SuppressLint("UseSparseArrays")
+            //TODO synchronized, deep copy
             final Map<Long,String> copyOfHeaderChanges = new HashMap<>(headerChanges);
             final Set<Long> copyOfRemovedItems = new HashSet<>(removedItems);
             final List<Long> copyOfOrder = order != null ? new ArrayList<>(order) : null;
-            executeInTransaction(() -> {
+            dbHelper.executeInTransaction(() -> {
                 for(Long id : copyOfHeaderChanges.keySet()) {
                     itemDao.updateHeaderById(id, copyOfHeaderChanges.get(id));
                 }

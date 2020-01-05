@@ -10,7 +10,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Answer<T> {
-    //Sample {"data":{"id":"IrBbLW7","deletehash":"mawZdBD3rz2VEDQ"},"success":true,"status":200}
     T data;
     boolean success;
     int status;

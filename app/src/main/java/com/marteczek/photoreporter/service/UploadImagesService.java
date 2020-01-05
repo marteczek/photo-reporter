@@ -1,6 +1,5 @@
 package com.marteczek.photoreporter.service;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 
@@ -15,9 +14,8 @@ import com.marteczek.photoreporter.database.entity.type.ElementStatus;
 import com.marteczek.photoreporter.database.entity.type.ReportStatus;
 import com.marteczek.photoreporter.picturehostclient.BaseResponse;
 import com.marteczek.photoreporter.picturehostclient.imgur.data.PictureMetadata;
-import com.marteczek.photoreporter.picturemanager.PictureManagerImpl;
+import com.marteczek.photoreporter.picturemanager.PictureManager;
 import com.marteczek.photoreporter.picturehostclient.ImageHostClient;
-import com.marteczek.photoreporter.service.baseservice.BaseService;
 import com.marteczek.photoreporter.service.misc.PictureFormat;
 
 import java.text.SimpleDateFormat;
@@ -29,11 +27,11 @@ import lombok.Getter;
 import static com.marteczek.photoreporter.application.Settings.Debug.D;
 import static com.marteczek.photoreporter.application.Settings.Debug.E;
 
-public class UploadImagesService extends BaseService {
+public class UploadImagesService {
 
     private static final String TAG = "UploadImagesService";
 
-    private final PictureManagerImpl pictureManager;
+    private final PictureManager pictureManager;
 
     private final ReportDao reportDao;
 
@@ -54,11 +52,10 @@ public class UploadImagesService extends BaseService {
         BaseResponse clientResponse;
     }
 
-    public UploadImagesService(Context context) {
-        super(context);
-        this.pictureManager = new PictureManagerImpl(context);
-        this.reportDao = db.reportDao();
-        this.itemDao = db.itemDao();
+    public UploadImagesService(PictureManager pictureManager, ReportDao reportDao, ItemDao itemDao) {
+        this.pictureManager = pictureManager;
+        this.reportDao = reportDao;
+        this.itemDao = itemDao;
     }
 
     public Response uploadImages(@NonNull Long reportId,

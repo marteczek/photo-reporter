@@ -2,6 +2,9 @@ package com.marteczek.photoreporter.application.configuration;
 
 import android.app.Application;
 
+import com.marteczek.photoreporter.application.MainThreadRunner;
+import com.marteczek.photoreporter.application.MainThreadRunnerImpl;
+import com.marteczek.photoreporter.database.ReportDatabaseHelper;
 import com.marteczek.photoreporter.database.dao.ItemDao;
 import com.marteczek.photoreporter.database.dao.PostDao;
 import com.marteczek.photoreporter.database.dao.ReportDao;
@@ -22,27 +25,36 @@ class ServiceModule {
 
     @Singleton
     @Provides
-    ItemService itemService(Application application, ItemDao itemDao, PictureManager pictureManager){
-        return new ItemService(application, itemDao, pictureManager);
+    MainThreadRunner mainThreadRunner(Application application) {
+        return new MainThreadRunnerImpl(application);
     }
 
     @Singleton
     @Provides
-    PostService postService(Application application, PostDao postDao, ItemDao itemDao, ReportDao reportDao){
-        return new PostService(application, postDao, itemDao, reportDao);
+    ItemService itemService(ItemDao itemDao, PictureManager pictureManager,
+                            ReportDatabaseHelper reportDatabaseHelper){
+        return new ItemService(itemDao, pictureManager, reportDatabaseHelper);
     }
 
     @Singleton
     @Provides
-    ReportService reportService(Application application, ReportDao reportDao, ItemDao itemDao,
-                                PostDao postDao, PictureManager pictureManager) {
-        return new ReportService(application.getApplicationContext(), reportDao, itemDao, postDao,
-                pictureManager);
+    PostService postService(PostDao postDao, ItemDao itemDao, ReportDao reportDao,
+                            ReportDatabaseHelper reportDatabaseHelper){
+        return new PostService(postDao, itemDao, reportDao, reportDatabaseHelper);
     }
 
     @Singleton
     @Provides
-    ThreadService threadService(Application application, ThreadDao threadDao) {
-        return new ThreadService(application, threadDao);
+    ReportService reportService(ReportDao reportDao, ItemDao itemDao, PostDao postDao,
+                                PictureManager pictureManager, ReportDatabaseHelper reportDatabaseHelper,
+                                MainThreadRunner mainThreadRunner) {
+        return new ReportService(reportDao, itemDao, postDao, pictureManager, reportDatabaseHelper,
+                mainThreadRunner);
+    }
+
+    @Singleton
+    @Provides
+    ThreadService threadService(ThreadDao threadDao, ReportDatabaseHelper reportDatabaseHelper) {
+        return new ThreadService(threadDao, reportDatabaseHelper);
     }
 }

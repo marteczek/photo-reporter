@@ -1,11 +1,10 @@
 package com.marteczek.photoreporter.service;
 
-import android.app.Application;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 
-import com.marteczek.photoreporter.database.ReportDatabase;
+import com.marteczek.photoreporter.database.ReportDatabaseHelper;
 import com.marteczek.photoreporter.database.dao.ItemDao;
 import com.marteczek.photoreporter.database.dao.PostDao;
 import com.marteczek.photoreporter.database.dao.ReportDao;
@@ -13,31 +12,34 @@ import com.marteczek.photoreporter.database.entity.Item;
 import com.marteczek.photoreporter.database.entity.Post;
 import com.marteczek.photoreporter.database.entity.Report;
 import com.marteczek.photoreporter.database.entity.type.ReportStatus;
-import com.marteczek.photoreporter.service.baseservice.BaseService;
 
 import java.util.List;
 
 import static com.marteczek.photoreporter.application.Settings.Debug.D;
 import static com.marteczek.photoreporter.application.Settings.Debug.E;
 
-public class PostService extends BaseService {
+public class PostService {
     private static final String TAG = "PostService";
 
-    private ItemDao itemDao;
+    private final ItemDao itemDao;
 
-    private ReportDao reportDao;
+    private final ReportDao reportDao;
 
-    private PostDao postDao;
+    private final PostDao postDao;
 
-    public PostService(Application application, PostDao postDao, ItemDao itemDao, ReportDao reportDao) {
-        super(application);
+    private final ReportDatabaseHelper dbHelper;
+
+    public PostService(PostDao postDao, ItemDao itemDao, ReportDao reportDao,
+                       ReportDatabaseHelper reportDatabaseHelper) {
         this.itemDao = itemDao;
         this.reportDao = reportDao;
         this.postDao = postDao;
+        this.dbHelper = reportDatabaseHelper;
     }
 
-    public void generatePosts(final Long reportId, final int picturesPerPost, String footer, OnErrorListener onErrorListener) {
-        executeInTransaction(() -> {
+    public void generatePosts(final Long reportId, final int picturesPerPost, final String footer,
+                              final OnErrorListener onErrorListener) {
+        dbHelper.executeInTransaction(() -> {
             try {
                 Report report = reportDao.findById(reportId);
                 if (report != null) {
@@ -104,7 +106,6 @@ public class PostService extends BaseService {
                     onErrorListener.onError(e);
                 }
             }
-
         });
     }
 
@@ -113,7 +114,6 @@ public class PostService extends BaseService {
     }
 
     public void updatePostById(final Long postId, final String postContent) {
-        ReportDatabase.databaseWriteExecutor.execute(
-                () -> postDao.updateContentById(postId, postContent));
+        dbHelper.execute(() -> postDao.updateContentById(postId, postContent));
     }
 }

@@ -1,13 +1,12 @@
 package com.marteczek.photoreporter.service;
 
-import android.content.Context;
 import android.net.Uri;
-import android.os.Handler;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 
-import com.marteczek.photoreporter.database.ReportDatabase;
+import com.marteczek.photoreporter.application.MainThreadRunner;
+import com.marteczek.photoreporter.database.ReportDatabaseHelper;
 import com.marteczek.photoreporter.database.dao.ItemDao;
 import com.marteczek.photoreporter.database.dao.PostDao;
 import com.marteczek.photoreporter.database.dao.ReportDao;
@@ -16,7 +15,6 @@ import com.marteczek.photoreporter.database.entity.Report;
 import com.marteczek.photoreporter.database.entity.type.ReportStatus;
 import com.marteczek.photoreporter.picturemanager.PictureManager;
 import com.marteczek.photoreporter.imagetools.ImageUtils;
-import com.marteczek.photoreporter.service.baseservice.BaseService;
 import com.marteczek.photoreporter.service.data.PictureItem;
 
 import java.io.IOException;
@@ -26,29 +24,35 @@ import java.util.List;
 
 import static com.marteczek.photoreporter.application.Settings.Debug.E;
 
-public class ReportService extends BaseService {
+public class ReportService {
     private final static String TAG = "ReportService";
+
+    private final ItemDao itemDao;
+
+    private final PostDao postDao;
+
+    private final ReportDao reportDao;
+
+    private final PictureManager pictureManager;
+
+    private final ReportDatabaseHelper dbHelper;
+
+    private final MainThreadRunner mainThreadRunner;
 
     @FunctionalInterface
     public interface OnFinishedListener {
         void onFinished(Long reportId);
     }
 
-    private ItemDao itemDao;
-
-    private PostDao postDao;
-
-    private ReportDao reportDao;
-
-    private PictureManager pictureManager;
-
-    public ReportService(final Context context, ReportDao reportDao, ItemDao itemDao,
-                         PostDao postDao, PictureManager pictureManager) {
-        super(context);
+    public ReportService(ReportDao reportDao, ItemDao itemDao, PostDao postDao,
+                         PictureManager pictureManager, ReportDatabaseHelper reportDatabaseHelper,
+                         MainThreadRunner mainThreadRunner) {
         this.reportDao = reportDao;
         this.itemDao = itemDao;
         this.postDao = postDao;
         this.pictureManager = pictureManager;
+        this.dbHelper = reportDatabaseHelper;
+        this.mainThreadRunner = mainThreadRunner;
     }
 
     public LiveData<Report> findReportByIdAsync(Long id) {
@@ -70,7 +74,7 @@ public class ReportService extends BaseService {
                                     final OnErrorListener onErrorListener) {
         List<PictureItem> pictures = Collections.synchronizedList(new ArrayList<>());
         pictures.addAll(listOfPictures);
-        executeInTransaction(() -> {
+        dbHelper.executeInTransaction(() -> {
             try {
                 Report report = reportDao.findById(reportId);
                 if (report != null && ReportStatus.NEW.equals(report.getStatus())) {
@@ -99,8 +103,7 @@ public class ReportService extends BaseService {
                         }
                     }
                     if (onFinishedListener != null) {
-                        Handler handler = new Handler(context.getMainLooper());
-                        handler.post(() -> onFinishedListener.onFinished(reportId));
+                        mainThreadRunner.run(() -> onFinishedListener.onFinished(reportId));
                     }
                 } else {
                     throw new IllegalStateException();
@@ -121,7 +124,7 @@ public class ReportService extends BaseService {
                                       final OnErrorListener onErrorListener) {
         final List<PictureItem> pictures = Collections.synchronizedList(new ArrayList<>());
         pictures.addAll(listOfPictures);
-        executeInTransaction(() -> {
+        dbHelper.executeInTransaction(() -> {
             try {
                 final long reportId = reportDao.insert(report);
                 long succession = 0L;
@@ -145,31 +148,29 @@ public class ReportService extends BaseService {
                     }
                 }
                 if (onFinishedListener != null) {
-                    Handler handler = new Handler(context.getMainLooper());
-                    handler.post(() -> onFinishedListener.onFinished(reportId));
+                    mainThreadRunner.run(() -> onFinishedListener.onFinished(reportId));
                 }
             } catch (final RuntimeException e) {
                 if(E) Log.e(TAG, "RuntimeException", e);
                 if (onErrorListener != null) {
-                    Handler handler = new Handler(context.getMainLooper());
-                    handler.post(() -> onErrorListener.onError(e));
+                    mainThreadRunner.run(() -> onErrorListener.onError(e));
                 }
             }
         });
     }
 
     public void updateReportName(final Long id, final String name) {
-        ReportDatabase.databaseWriteExecutor.execute(() -> reportDao.updateNameById(id, name));
+        dbHelper.execute(() -> reportDao.updateNameById(id, name));
     }
 
     public void updateThreadId(final Long id, final String newThreadId) {
-        ReportDatabase.databaseWriteExecutor.execute(() ->
+        dbHelper.execute(() ->
                 reportDao.updateThreadId(id, newThreadId));
     }
 
     public void deleteReportWithDependencies(final Long reportId,
                                              final OnErrorListener onErrorListener) {
-        executeInTransaction(() -> {
+        dbHelper.executeInTransaction(() -> {
             try {
                 List<Item> items = itemDao.findByReportId(reportId);
                 itemDao.deleteByReportId(reportId);

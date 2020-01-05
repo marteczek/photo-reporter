@@ -36,6 +36,4 @@ public class FindThreadActivityTest {
         //then
         assertEquals("1195867", group);
     }
-
-
 }

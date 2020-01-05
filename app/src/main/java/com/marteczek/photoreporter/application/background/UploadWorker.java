@@ -18,12 +18,14 @@ import androidx.work.impl.foreground.SystemForegroundDispatcher;
 import com.marteczek.photoreporter.R;
 import com.marteczek.photoreporter.application.Settings;
 import com.marteczek.photoreporter.application.data.ImgurUserData;
+import com.marteczek.photoreporter.database.ReportDatabase;
 import com.marteczek.photoreporter.picturehostclient.BaseResponse;
 import com.marteczek.photoreporter.picturehostclient.ImageHostClient;
 import com.marteczek.photoreporter.picturehostclient.imgur.ImgurAccountClient;
 import com.marteczek.photoreporter.picturehostclient.imgur.ImgurAnonymousClient;
 import com.marteczek.photoreporter.picturehostclient.imgur.ImgurResponse;
 import com.marteczek.photoreporter.picturehostclient.testclient.TestClient;
+import com.marteczek.photoreporter.picturemanager.PictureManagerImpl;
 import com.marteczek.photoreporter.service.misc.PictureFormat;
 import com.marteczek.photoreporter.service.UploadImagesService;
 
@@ -105,7 +107,9 @@ public class UploadWorker extends Worker implements UploadImagesService.UploadMa
                 .addAction(android.R.drawable.ic_delete,
                         context.getString(R.string.notification_upload_cancel), intent);
         setForegroundAsync(new ForegroundInfo(notificationBuilder.build()));
-        UploadImagesService uploadImagesService = new UploadImagesService(context);
+        ReportDatabase db = ReportDatabase.getDatabase(context);
+        UploadImagesService uploadImagesService = new UploadImagesService(new PictureManagerImpl(context),
+                db.reportDao(), db.itemDao());
         Long reportId = getInputData().getLong(DATA_REPORT_ID, 0);
         int dimension = Settings.getPictureDimension(context);
         PictureFormat pictureFormat = PictureFormat.builder().greaterDimension(dimension).build();

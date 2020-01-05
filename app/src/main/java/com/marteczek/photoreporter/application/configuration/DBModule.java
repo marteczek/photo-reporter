@@ -3,6 +3,8 @@ package com.marteczek.photoreporter.application.configuration;
 import android.app.Application;
 
 import com.marteczek.photoreporter.database.ReportDatabase;
+import com.marteczek.photoreporter.database.ReportDatabaseHelper;
+import com.marteczek.photoreporter.database.ReportDatabaseHelperImpl;
 import com.marteczek.photoreporter.database.dao.ItemDao;
 import com.marteczek.photoreporter.database.dao.PostDao;
 import com.marteczek.photoreporter.database.dao.ReportDao;
@@ -20,6 +22,12 @@ class DBModule {
     @Provides
     ReportDatabase reportDatabase(Application application) {
         return ReportDatabase.getDatabase(application.getApplicationContext());
+    }
+
+    @Singleton
+    @Provides
+    ReportDatabaseHelper reportDatabaseHelper(Application application) {
+        return new ReportDatabaseHelperImpl(application.getApplicationContext());
     }
 
     @Singleton

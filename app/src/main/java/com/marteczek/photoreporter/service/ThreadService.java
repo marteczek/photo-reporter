@@ -1,27 +1,28 @@
 package com.marteczek.photoreporter.service;
 
-import android.app.Application;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 
-import com.marteczek.photoreporter.database.ReportDatabase;
+import com.marteczek.photoreporter.database.ReportDatabaseHelper;
 import com.marteczek.photoreporter.database.dao.ThreadDao;
 import com.marteczek.photoreporter.database.entity.ForumThread;
-import com.marteczek.photoreporter.service.baseservice.BaseService;
 
 import java.util.List;
 
 import static com.marteczek.photoreporter.application.Settings.Debug.E;
 
-public class ThreadService extends BaseService {
+public class ThreadService {
 
     private static final String TAG = "BaseService";
-    private ThreadDao threadDao;
 
-    public ThreadService(Application application, ThreadDao threadDao) {
-        super(application);
+    private final ThreadDao threadDao;
+
+    private final ReportDatabaseHelper dbHelper;
+
+    public ThreadService(ThreadDao threadDao, ReportDatabaseHelper reportDatabaseHelper) {
         this.threadDao = threadDao;
+        this.dbHelper = reportDatabaseHelper;
     }
 
     public LiveData<List<ForumThread>> findThreadsOrderByName() {
@@ -33,7 +34,7 @@ public class ThreadService extends BaseService {
     }
 
     public void saveThread(ForumThread thread, OnErrorListener onErrorListener) {
-        executeInTransaction(() -> {
+        dbHelper.executeInTransaction(() -> {
             try {
                 String threadId = thread.getThreadId();
                 if (threadDao.findByThreadId(threadId) == null) {
@@ -52,6 +53,6 @@ public class ThreadService extends BaseService {
     }
 
     public void deleteThread(String threadId) {
-        ReportDatabase.databaseWriteExecutor.execute(() -> threadDao.deleteByThreadId(threadId));
+        dbHelper.execute(() -> threadDao.deleteByThreadId(threadId));
     }
 }

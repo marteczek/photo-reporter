@@ -9,6 +9,9 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import com.marteczek.photoreporter.R;
+import com.marteczek.photoreporter.database.ReportDatabase;
+import com.marteczek.photoreporter.database.ReportDatabaseHelperImpl;
+import com.marteczek.photoreporter.picturemanager.PictureManagerImpl;
 import com.marteczek.photoreporter.service.ItemService;
 
 public class ThumbnailWorker extends Worker {
@@ -21,7 +24,9 @@ public class ThumbnailWorker extends Worker {
             @NonNull Context context,
             @NonNull WorkerParameters params) {
         super(context, params);
-        itemService = new ItemService(getApplicationContext());
+        ReportDatabase db = ReportDatabase.getDatabase(context);
+        itemService = new ItemService(db.itemDao(), new PictureManagerImpl(context),
+                new ReportDatabaseHelperImpl(context));
     }
 
     @Override
