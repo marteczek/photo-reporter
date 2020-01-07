@@ -47,10 +47,14 @@ public class PostService {
                     postDao.deleteByReportId(reportId);
                     List<Item> items = itemDao.findByReportIdOrderBySuccession(reportId);
                     int itemsSize = items.size();
+                    if (itemsSize == 0) {
+                        Log.d(TAG, "Can't generate posts. Report has no items");
+                        return;
+                    }
                     int globalIndex = 1;
                     int localIndex = 1;
                     long postIndex = 1;
-                    long postsNumber = (itemsSize != 0 && picturesPerPost > 0) ?
+                    long postsNumber = (picturesPerPost > 0) ?
                             itemsSize / picturesPerPost + (itemsSize % picturesPerPost > 0 ? 1 : 0)
                             : 1;
                     Long postId = null;
@@ -81,7 +85,7 @@ public class PostService {
                             contentBuilder.append("[/IMG]\n\n");
                         }
                         itemDao.updatePostIdById(item.getId(), postId);
-                        if (globalIndex == itemsSize) {
+                        if (globalIndex == itemsSize && footer != null) {
                             contentBuilder.append(footer);
                         }
                         if ((picturesPerPost != 0 && localIndex == picturesPerPost)

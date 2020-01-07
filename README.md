@@ -4,7 +4,6 @@ This is an Android application for publishing posts with lots of pictures on www
 
 ### Requirements
 
-* Imgur account
 * skyscrapercity.com account
 
 

@@ -26,14 +26,15 @@ class ServiceModule {
     @Singleton
     @Provides
     MainThreadRunner mainThreadRunner(Application application) {
-        return new MainThreadRunnerImpl(application);
+        return new MainThreadRunnerImpl(application.getApplicationContext());
     }
 
     @Singleton
     @Provides
     ItemService itemService(ItemDao itemDao, PictureManager pictureManager,
-                            ReportDatabaseHelper reportDatabaseHelper){
-        return new ItemService(itemDao, pictureManager, reportDatabaseHelper);
+                            ReportDatabaseHelper reportDatabaseHelper,
+                            MainThreadRunner mainThreadRunner){
+        return new ItemService(itemDao, pictureManager, reportDatabaseHelper, mainThreadRunner);
     }
 
     @Singleton
