@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.util.Log;
 
@@ -18,7 +19,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import static com.marteczek.photoreporter.application.Settings.Debug.E;
-import static com.marteczek.photoreporter.imagetools.ImageUtils.calculateInSampleSize;
+import static com.marteczek.photoreporter.picturemanager.ImageUtils.calculateInSampleSize;
 
 
 public class PictureManagerImpl implements PictureManager {
@@ -135,5 +136,25 @@ public class PictureManagerImpl implements PictureManager {
     public boolean deleteFile(String path) {
         File file = new File(path);
         return file.delete();
+    }
+
+    @Override
+    public int getImageRotation(String path) {
+        try {
+            ExifInterface exif = new ExifInterface(path);
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL);
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    return 270;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    return 180;
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    return 90;
+            }
+        } catch (IOException e) {
+            //ignored
+        }
+        return 0;
     }
 }

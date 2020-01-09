@@ -29,6 +29,9 @@ public interface ItemDao {
     List<Item> findByReportIdAndStatusesOrderBySuccession(Long reportId, String[] statuses);
 
     @Query("SELECT * FROM items")
+    List<Item> findAll();
+
+    @Query("SELECT * FROM items")
     LiveData<List<Item>> findAllAsync();
 
     @Query("SELECT * FROM items WHERE id_report = :reportId")
@@ -81,4 +84,5 @@ public interface ItemDao {
 
     @Query("UPDATE items SET thumbnail_path = :path WHERE id = :id")
     void updateThumbnailPathById(Long id, String path);
+
 }

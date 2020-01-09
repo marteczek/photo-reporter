@@ -12,9 +12,9 @@ import com.marteczek.photoreporter.database.dao.PostDao;
 import com.marteczek.photoreporter.database.dao.ReportDao;
 import com.marteczek.photoreporter.database.entity.Item;
 import com.marteczek.photoreporter.database.entity.Report;
+import com.marteczek.photoreporter.database.entity.type.ElementStatus;
 import com.marteczek.photoreporter.database.entity.type.ReportStatus;
 import com.marteczek.photoreporter.picturemanager.PictureManager;
-import com.marteczek.photoreporter.imagetools.ImageUtils;
 import com.marteczek.photoreporter.service.data.PictureItem;
 
 import java.io.IOException;
@@ -40,7 +40,7 @@ public class ReportService {
     private final MainThreadRunner mainThreadRunner;
 
     @FunctionalInterface
-    public interface OnFinishedListener {
+    public interface OnFinishListener {
         void onFinished(Long reportId);
     }
 
@@ -70,7 +70,7 @@ public class ReportService {
     public void insertItemsToReport(final Long reportId,
                                     final List<PictureItem> listOfPictures,
                                     final int thumbnailDimension,
-                                    final OnFinishedListener onFinishedListener,
+                                    final OnFinishListener onFinishListener,
                                     final OnErrorListener onErrorListener) {
         List<PictureItem> pictures = Collections.synchronizedList(new ArrayList<>());
         pictures.addAll(listOfPictures);
@@ -89,12 +89,13 @@ public class ReportService {
                                     .pictureUri(uri.toString())
                                     .thumbnailRequiredWidth(thumbnailDimension)
                                     .thumbnailRequiredHeight(thumbnailDimension)
-                                    .status("new")
+                                    .status(ElementStatus.NEW)
                                     .build());
                             try {
                                 String path = pictureManager.copy(uri, "picture" + itemId);
                                 itemDao.updatePicturePathById(itemId, path);
-                                itemDao.updatePictureRotationById(itemId, ImageUtils.getImageRotation(path));
+                                itemDao.updatePictureRotationById(itemId,
+                                        pictureManager.getImageRotation(path));
                                 itemDao.updateSuccessionById(itemId, succession++);
                             } catch (IOException e) {
                                 if (E) Log.e(TAG, "IOException", e);
@@ -102,8 +103,8 @@ public class ReportService {
                             }
                         }
                     }
-                    if (onFinishedListener != null) {
-                        mainThreadRunner.run(() -> onFinishedListener.onFinished(reportId));
+                    if (onFinishListener != null) {
+                        mainThreadRunner.run(() -> onFinishListener.onFinished(reportId));
                     }
                 } else {
                     throw new IllegalStateException();
@@ -120,7 +121,7 @@ public class ReportService {
     public void insertReportWithItems(final Report report,
                                       final List<PictureItem> listOfPictures,
                                       final int thumbnailDimension,
-                                      final OnFinishedListener onFinishedListener,
+                                      final OnFinishListener onFinishedListener,
                                       final OnErrorListener onErrorListener) {
         final List<PictureItem> pictures = Collections.synchronizedList(new ArrayList<>());
         pictures.addAll(listOfPictures);
@@ -140,7 +141,8 @@ public class ReportService {
                     try {
                         String path = pictureManager.copy(uri, "picture" + itemId);
                         itemDao.updatePicturePathById(itemId, path);
-                        itemDao.updatePictureRotationById(itemId, ImageUtils.getImageRotation(path));
+                        itemDao.updatePictureRotationById(itemId,
+                                pictureManager.getImageRotation(path));
                         itemDao.updateSuccessionById(itemId, succession++);
                     } catch (IOException e) {
                         if(E) Log.e(TAG, "IOException", e);

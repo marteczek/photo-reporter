@@ -22,4 +22,6 @@ public interface PictureManager {
     String savePicture(Bitmap bitmap, String newFileName);
 
     boolean deleteFile(String path);
+
+    int getImageRotation(String path);
 }

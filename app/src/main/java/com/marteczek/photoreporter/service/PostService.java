@@ -48,7 +48,7 @@ public class PostService {
                     List<Item> items = itemDao.findByReportIdOrderBySuccession(reportId);
                     int itemsSize = items.size();
                     if (itemsSize == 0) {
-                        Log.d(TAG, "Can't generate posts. Report has no items");
+                        if (D) Log.d(TAG, "Can't generate posts. Report has no items");
                         return;
                     }
                     int globalIndex = 1;

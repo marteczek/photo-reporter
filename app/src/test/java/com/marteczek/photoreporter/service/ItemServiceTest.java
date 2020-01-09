@@ -90,10 +90,10 @@ public class ItemServiceTest {
         //when
         service.updateItems(headerChanges, removedItems, order, null);
         //then
-        ArgumentCaptor<Long> idCapator = ArgumentCaptor.forClass(Long.class);
-        ArgumentCaptor<Long> successionCapator = ArgumentCaptor.forClass(Long.class);
-        verify(itemDao, times(3)).updateSuccessionById(idCapator.capture(), successionCapator.capture());
-        long firstNo = successionCapator.getAllValues().get(0);
+        ArgumentCaptor<Long> idCaptor = ArgumentCaptor.forClass(Long.class);
+        ArgumentCaptor<Long> successionCaptor = ArgumentCaptor.forClass(Long.class);
+        verify(itemDao, times(3)).updateSuccessionById(idCaptor.capture(), successionCaptor.capture());
+        long firstNo = successionCaptor.getAllValues().get(0);
         verify(itemDao, times(1)).updateSuccessionById(3L, firstNo);
         verify(itemDao, times(1)).updateSuccessionById(1L, firstNo + 1);
         verify(itemDao, times(1)).updateSuccessionById(2L, firstNo + 2);
