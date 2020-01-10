@@ -1,8 +1,6 @@
 package com.marteczek.photoreporter.service.data;
 
 
-import android.net.Uri;
-
 import java.util.Date;
 
 import lombok.AllArgsConstructor;
@@ -17,6 +15,6 @@ import lombok.Setter;
 public class PictureItem {
     private String header;
     private String picturePath;
-    private Uri pictureUri;
+    private String pictureUri;
     private Date lastModified;
 }

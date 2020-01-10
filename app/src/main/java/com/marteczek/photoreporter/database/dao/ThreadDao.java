@@ -32,10 +32,8 @@ public interface ThreadDao {
     @Query("SELECT * FROM threads ORDER BY name")
     LiveData<List<ForumThread>> findAllOrderByNameAsync();
 
-    @Query("UPDATE threads SET last_usage = :lastUsage WHERE thread_id = :threadId")
-    void updateLastUsageByThreadId(String threadId, Date lastUsage);
-
-    @Query("UPDATE threads SET name = :name WHERE thread_id = :threadId")
-    void updateNameByThreadId(String threadId, String name);
-
+    @Query("UPDATE threads SET name = :name, last_usage = :lastUsage, thread_path = :threadPath " +
+            "WHERE thread_id = :threadId")
+    void updateNameLastUsageAndThreadPathByThreadId(String threadId, String name, Date lastUsage,
+                                                    String threadPath);
 }

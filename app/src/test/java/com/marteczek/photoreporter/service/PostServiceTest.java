@@ -79,10 +79,10 @@ public class PostServiceTest {
         //when
         postService.generatePosts(1L, 0, null, null);
         //then
-        ArgumentCaptor<Long> idCapator = ArgumentCaptor.forClass(Long.class);
-        ArgumentCaptor<String> contentCapator = ArgumentCaptor.forClass(String.class);
-        verify(postDao, times(1)).updateContentById(idCapator.capture(), contentCapator.capture());
-        String content = contentCapator.getAllValues().get(0);
+        ArgumentCaptor<Long> idCaptor = ArgumentCaptor.forClass(Long.class);
+        ArgumentCaptor<String> contentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(postDao, times(1)).updateContentById(idCaptor.capture(), contentCaptor.capture());
+        String content = contentCaptor.getAllValues().get(0);
         String sample ="1. h1 [IMG]url1[/IMG] 2. [IMG]url2[/IMG] 3. h3 [IMG]url3[/IMG]";
         String pattern = generatePattern(sample);
         assertTrue(content.matches(pattern));
@@ -128,10 +128,10 @@ public class PostServiceTest {
         //when
         postService.generatePosts(1L, 2, "footer", null);
         //then
-        ArgumentCaptor<Long> idCapator = ArgumentCaptor.forClass(Long.class);
-        ArgumentCaptor<String> contentCapator = ArgumentCaptor.forClass(String.class);
-        verify(postDao, times(1)).updateContentById(idCapator.capture(), contentCapator.capture());
-        String content = contentCapator.getAllValues().get(0);
+        ArgumentCaptor<Long> idCaptor = ArgumentCaptor.forClass(Long.class);
+        ArgumentCaptor<String> contentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(postDao, times(1)).updateContentById(idCaptor.capture(), contentCaptor.capture());
+        String content = contentCaptor.getAllValues().get(0);
         String sample ="1. h1 [IMG]url1[/IMG] footer";
         String pattern = generatePattern(sample);
         assertTrue(content.matches(pattern));

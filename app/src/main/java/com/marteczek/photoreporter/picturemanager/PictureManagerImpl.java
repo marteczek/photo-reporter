@@ -32,8 +32,9 @@ public class PictureManagerImpl implements PictureManager {
     }
 
     @Override
-    public String copy(Uri sourceUri, String newFileName) throws IOException {
-        InputStream in = context.getContentResolver().openInputStream(sourceUri);
+    public String copy(String sourceUri, String newFileName) throws IOException {
+        Uri uri = Uri.parse(sourceUri);
+        InputStream in = context.getContentResolver().openInputStream(uri);
         File outFile = new File(getFilesDir(), newFileName);
         OutputStream out = new FileOutputStream(outFile);
         byte[] buffer = new byte[1024];

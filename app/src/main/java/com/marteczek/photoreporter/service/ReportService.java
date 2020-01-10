@@ -1,6 +1,5 @@
 package com.marteczek.photoreporter.service;
 
-import android.net.Uri;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -41,7 +40,7 @@ public class ReportService {
 
     @FunctionalInterface
     public interface OnFinishListener {
-        void onFinished(Long reportId);
+        void onFinish(Long reportId);
     }
 
     public ReportService(ReportDao reportDao, ItemDao itemDao, PostDao postDao,
@@ -81,12 +80,12 @@ public class ReportService {
                     Long succession = itemDao.findMaxSuccessionByReportId(reportId);
                     succession = succession == null ? 0L : succession + 1;
                     for (PictureItem pictureItem : listOfPictures) {
-                        Uri uri = pictureItem.getPictureUri();
-                        if (itemDao.findByReportIdAndPictureUri(reportId, uri.toString()).size()
+                        String uri = pictureItem.getPictureUri();
+                        if (itemDao.findByReportIdAndPictureUri(reportId, uri).size()
                                 == 0) {
                             Long itemId = itemDao.insert(Item.builder()
                                     .reportId(reportId)
-                                    .pictureUri(uri.toString())
+                                    .pictureUri(uri)
                                     .thumbnailRequiredWidth(thumbnailDimension)
                                     .thumbnailRequiredHeight(thumbnailDimension)
                                     .status(ElementStatus.NEW)
@@ -104,7 +103,7 @@ public class ReportService {
                         }
                     }
                     if (onFinishListener != null) {
-                        mainThreadRunner.run(() -> onFinishListener.onFinished(reportId));
+                        mainThreadRunner.run(() -> onFinishListener.onFinish(reportId));
                     }
                 } else {
                     throw new IllegalStateException();
@@ -130,10 +129,10 @@ public class ReportService {
                 final long reportId = reportDao.insert(report);
                 long succession = 0L;
                 for (PictureItem pictureItem : pictures) {
-                    Uri uri = pictureItem.getPictureUri();
+                    String uri = pictureItem.getPictureUri();
                     Long itemId = itemDao.insert(Item.builder()
                             .reportId(reportId)
-                            .pictureUri(uri.toString())
+                            .pictureUri(uri)
                             .thumbnailRequiredWidth(thumbnailDimension)
                             .thumbnailRequiredHeight(thumbnailDimension)
                             .status("new")
@@ -150,7 +149,7 @@ public class ReportService {
                     }
                 }
                 if (onFinishedListener != null) {
-                    mainThreadRunner.run(() -> onFinishedListener.onFinished(reportId));
+                    mainThreadRunner.run(() -> onFinishedListener.onFinish(reportId));
                 }
             } catch (final RuntimeException e) {
                 if(E) Log.e(TAG, "RuntimeException", e);

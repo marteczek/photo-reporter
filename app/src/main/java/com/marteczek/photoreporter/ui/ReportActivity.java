@@ -376,7 +376,7 @@ public class ReportActivity extends AppCompatActivity {
                 if (documentFile != null) {
                     lastModified = new Date(documentFile.lastModified());
                 }
-                PictureItem pictureItem = PictureItem.builder().pictureUri(uri)
+                PictureItem pictureItem = PictureItem.builder().pictureUri(uri.toString())
                         .lastModified(lastModified).build();
                 listOfPictures.add(pictureItem);
             }
@@ -387,7 +387,7 @@ public class ReportActivity extends AppCompatActivity {
             if (documentFile != null) {
                 lastModified = new Date(documentFile.lastModified());
             }
-            PictureItem pictureItem = PictureItem.builder().pictureUri(uri)
+            PictureItem pictureItem = PictureItem.builder().pictureUri(uri.toString())
                     .lastModified(lastModified).build();
             listOfPictures.add(pictureItem);
         }

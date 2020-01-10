@@ -57,7 +57,7 @@ public class SettingsWatermarkViewModel extends AndroidViewModel {
             Uri watermarkUri = uris[0];
             String watermarkFileName = Settings.WATERMARK_FILE_NAME;
             try {
-                String watermarkPath = pictureManager.copy(watermarkUri, watermarkFileName);
+                String watermarkPath = pictureManager.copy(watermarkUri.toString(), watermarkFileName);
                 String thumbnailPath = pictureManager.generateThumbnail(watermarkPath,
                         WATERMARK_THUMBNAIL_FILE_NAME, THUMBNAIL_SIZE, THUMBNAIL_SIZE);
                 Bitmap bitmap = BitmapFactory.decodeFile(thumbnailPath);

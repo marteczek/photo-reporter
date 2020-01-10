@@ -1,13 +1,12 @@
 package com.marteczek.photoreporter.picturemanager;
 
 import android.graphics.Bitmap;
-import android.net.Uri;
 
 import java.io.File;
 import java.io.IOException;
 
 public interface PictureManager {
-    String copy(Uri sourceUri, String newFileName) throws IOException;
+    String copy(String sourceUri, String newFileName) throws IOException;
 
     File getFilesDir();
 

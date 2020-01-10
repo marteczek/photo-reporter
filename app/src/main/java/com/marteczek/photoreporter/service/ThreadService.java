@@ -40,8 +40,8 @@ public class ThreadService {
                 if (threadDao.findByThreadId(threadId) == null) {
                     threadDao.insert(thread);
                 } else {
-                    threadDao.updateNameByThreadId(threadId, thread.getName());
-                    threadDao.updateLastUsageByThreadId(threadId, thread.getLastUsage());
+                    threadDao.updateNameLastUsageAndThreadPathByThreadId(thread.getThreadId(),
+                            thread.getName(), thread.getLastUsage(), thread.getThreadPath());
                 }
             } catch (RuntimeException e) {
                 if(E) Log.e(TAG, "RuntimeException", e);

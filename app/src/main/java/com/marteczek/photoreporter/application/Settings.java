@@ -8,6 +8,7 @@ import android.util.Log;
 import androidx.preference.PreferenceManager;
 
 import com.google.gson.Gson;
+import com.marteczek.photoreporter.BuildConfig;
 import com.marteczek.photoreporter.R;
 import com.marteczek.photoreporter.application.data.ImgurUserData;
 
@@ -21,8 +22,8 @@ public class Settings {
     private static final String TAG = "Settings";
 
     public static class Debug {
-        public static final boolean D = true;
-        public static final boolean E = true;
+        public static final boolean D = BuildConfig.DEBUG;
+        public static final boolean E = BuildConfig.DEBUG;
         public static final boolean TEST_UPLOAD_CLIENT_ENABLED = false;
         public static final boolean TEST_UPLOAD_CLIENT_SIMULATE_ERROR = false;
         public static final boolean DONT_PUBLISH_POSTS = false;

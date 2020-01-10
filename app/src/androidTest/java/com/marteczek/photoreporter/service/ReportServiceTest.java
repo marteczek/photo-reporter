@@ -1,7 +1,6 @@
 package com.marteczek.photoreporter.service;
 
 import android.content.Context;
-import android.net.Uri;
 
 import androidx.room.Room;
 import androidx.test.core.app.ApplicationProvider;
@@ -32,7 +31,11 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(AndroidJUnit4.class)
@@ -60,15 +63,15 @@ public class ReportServiceTest {
         reportDao = db.reportDao();
         itemDao = db.itemDao();
         postDao = db.postDao();
-   }
+    }
 
-   @Before
-   public void intMocks() {
-       MockitoAnnotations.initMocks(this);
-   }
+    @Before
+    public void intMocks() {
+        MockitoAnnotations.initMocks(this);
+    }
 
     @After
-    public void closeDb(){
+    public void closeDb() {
         db.close();
     }
 
@@ -83,9 +86,9 @@ public class ReportServiceTest {
         ReportService service = new ReportService(reportDao, itemDao, postDao, pictureManager,
                 reportDatabaseHelper, mainThreadRunner);
         Report report = Report.builder().id(1L).name("R1").status(ReportStatus.NEW).build();
-        Long reportId  = reportDao.insert(report);
+        Long reportId = reportDao.insert(report);
         List<PictureItem> pictures = new ArrayList<>();
-        pictures.add(PictureItem.builder().pictureUri(Uri.parse("test:1")).build());
+        pictures.add(PictureItem.builder().pictureUri("test:1").build());
         //when
         service.insertItemsToReport(reportId, pictures, 200, null, null);
         //then
@@ -103,9 +106,9 @@ public class ReportServiceTest {
         ReportService service = new ReportService(reportDao, itemDao, postDao, pictureManager,
                 reportDatabaseHelper, mainThreadRunner);
         Report report = Report.builder().id(1L).name("R1").status(ReportStatus.NEW).build();
-        Long reportId  = reportDao.insert(report);
+        Long reportId = reportDao.insert(report);
         List<PictureItem> pictures = new ArrayList<>();
-        Uri[] uris = new Uri[]{Uri.parse("test:1"), Uri.parse("test:2"), Uri.parse("test:3")};
+        String[] uris = new String[]{"test:1", "test:2", "test:3"};
         pictures.add(PictureItem.builder().pictureUri(uris[0]).build());
         pictures.add(PictureItem.builder().pictureUri(uris[1]).build());
         pictures.add(PictureItem.builder().pictureUri(uris[2]).build());
@@ -114,8 +117,48 @@ public class ReportServiceTest {
         //then
         List<Item> items = itemDao.findAll();
         assertEquals(3, items.size());
-        assertEquals("test:1", items.get(0).getPictureUri());
-        assertEquals("test:2", items.get(1).getPictureUri());
-        assertEquals("test:3", items.get(2).getPictureUri());
+        assertEquals(uris[0], items.get(0).getPictureUri());
+        assertEquals(uris[1], items.get(1).getPictureUri());
+        assertEquals(uris[2], items.get(2).getPictureUri());
+    }
+
+    @Test
+    public void insertReportWithItems_reportWithOnePhotoProvided_correctObjectsAreInserted(){
+        //given
+        try {
+            when(pictureManager.copy(any(), any())).thenReturn("path");
+        } catch (IOException e) {
+            //ignore
+        }
+        ReportService service = new ReportService(reportDao, itemDao, postDao, pictureManager,
+                reportDatabaseHelper, mainThreadRunner);
+        Report report = Report.builder().id(1L).name("R1").status(ReportStatus.NEW).build();
+        List<PictureItem> pictures = new ArrayList<>();
+        pictures.add(PictureItem.builder().pictureUri("test:1").build());
+        //when
+        service.insertReportWithItems(report, pictures, 200, null, null);
+        //then
+        List<Item> items = itemDao.findAll();
+        assertEquals(1, items.size());
+        Item item = items.get(0);
+        assertNotNull(item.getPicturePath());
+        assertNotNull(item.getPictureUri());
+        assertNotNull(item.getSuccession());
+    }
+
+    @Test
+    public void deleteReportWithDependencies_reportWithItemExists_reportAndDependenciesAreDeleted(){
+        //given
+        ReportService service = new ReportService(reportDao, itemDao, postDao, pictureManager,
+                reportDatabaseHelper, mainThreadRunner);
+        Report report = Report.builder().name("R1").status(ReportStatus.NEW).build();
+        Long reportId = reportDao.insert(report);
+        Item item = Item.builder().reportId(reportId).picturePath("path").pictureUri("uri:1").build();
+        itemDao.insert(item);
+        //when
+        service.deleteReportWithDependencies(reportId, null);
+        //then
+        assertNull(reportDao.findById(reportId));
+        verify(pictureManager, times(1)).deleteFile(eq("path"));
     }
 }
