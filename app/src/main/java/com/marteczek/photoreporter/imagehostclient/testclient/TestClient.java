@@ -1,11 +1,11 @@
-package com.marteczek.photoreporter.picturehostclient.testclient;
+package com.marteczek.photoreporter.imagehostclient.testclient;
 
 import android.util.Log;
 
-import com.marteczek.photoreporter.picturehostclient.BaseResponse;
-import com.marteczek.photoreporter.picturehostclient.ImageHostClient;
-import com.marteczek.photoreporter.picturehostclient.imgur.ImgurResponse;
-import com.marteczek.photoreporter.picturehostclient.imgur.data.PictureMetadata;
+import com.marteczek.photoreporter.imagehostclient.BaseResponse;
+import com.marteczek.photoreporter.imagehostclient.ImageHostClient;
+import com.marteczek.photoreporter.imagehostclient.imgur.ImgurResponse;
+import com.marteczek.photoreporter.imagehostclient.imgur.data.PictureMetadata;
 
 import static com.marteczek.photoreporter.application.Settings.Debug.E;
 import static com.marteczek.photoreporter.application.Settings.Debug.TEST_UPLOAD_CLIENT_SIMULATE_ERROR;

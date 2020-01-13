@@ -1,4 +1,4 @@
-package com.marteczek.photoreporter.picturehostclient.imgur;
+package com.marteczek.photoreporter.imagehostclient.imgur;
 
 import okhttp3.MultipartBody;
 import retrofit2.Call;

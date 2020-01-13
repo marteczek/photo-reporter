@@ -11,6 +11,7 @@ import com.marteczek.photoreporter.database.ReportDatabaseHelper;
 import com.marteczek.photoreporter.database.dao.ThreadDao;
 import com.marteczek.photoreporter.database.entity.ForumThread;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,11 +28,18 @@ public class ThreadServiceTest {
 
     private ReportDatabaseHelper reportDatabaseHelper = new ReportDatabaseHelperTestImpl();
 
+    private ReportDatabase db;
+
     @Before
     public void createDb() {
         Context context = ApplicationProvider.getApplicationContext();
-        ReportDatabase db = Room.inMemoryDatabaseBuilder(context, ReportDatabase.class).build();
+        db = Room.inMemoryDatabaseBuilder(context, ReportDatabase.class).build();
         threadDao = db.threadDao();
+    }
+
+    @After
+    public void closeDb() {
+        db.close();
     }
 
     @Test

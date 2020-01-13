@@ -1,12 +1,12 @@
-package com.marteczek.photoreporter.picturehostclient.imgur;
+package com.marteczek.photoreporter.imagehostclient.imgur;
 
 import android.content.Context;
 
 import com.google.gson.reflect.TypeToken;
-import com.marteczek.photoreporter.picturehostclient.ImageHostClient;
-import com.marteczek.photoreporter.picturehostclient.BaseResponse;
-import com.marteczek.photoreporter.picturehostclient.imgur.dto.Album;
-import com.marteczek.photoreporter.picturehostclient.imgur.dto.Answer;
+import com.marteczek.photoreporter.imagehostclient.ImageHostClient;
+import com.marteczek.photoreporter.imagehostclient.BaseResponse;
+import com.marteczek.photoreporter.imagehostclient.imgur.dto.Album;
+import com.marteczek.photoreporter.imagehostclient.imgur.dto.Answer;
 
 import java.io.IOException;
 import java.lang.reflect.Type;

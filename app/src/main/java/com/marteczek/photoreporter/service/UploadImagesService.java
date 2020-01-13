@@ -12,10 +12,10 @@ import com.marteczek.photoreporter.database.entity.Item;
 import com.marteczek.photoreporter.database.entity.Report;
 import com.marteczek.photoreporter.database.entity.type.ElementStatus;
 import com.marteczek.photoreporter.database.entity.type.ReportStatus;
-import com.marteczek.photoreporter.picturehostclient.BaseResponse;
-import com.marteczek.photoreporter.picturehostclient.imgur.data.PictureMetadata;
+import com.marteczek.photoreporter.imagehostclient.BaseResponse;
+import com.marteczek.photoreporter.imagehostclient.imgur.data.PictureMetadata;
 import com.marteczek.photoreporter.picturemanager.PictureManager;
-import com.marteczek.photoreporter.picturehostclient.ImageHostClient;
+import com.marteczek.photoreporter.imagehostclient.ImageHostClient;
 import com.marteczek.photoreporter.service.misc.PictureFormat;
 
 import java.text.SimpleDateFormat;
@@ -77,7 +77,7 @@ public class UploadImagesService {
             }
             BaseResponse response;
             response = imageHostClient.connect(items.size());
-            if (!response.isCanContinue()) {
+            if (!response.isContinuable()) {
                 reportDao.updateStatusById(reportId, ReportStatus.PICTURE_SENDING_FAILURE);
                 itemDao.updateStatusByReportId(reportId, ElementStatus.NEW);
                 return Response.builder().succeeded(false).clientResponse(response).build();
@@ -96,7 +96,7 @@ public class UploadImagesService {
                     albumMetadata = response.getAlbumMetadata();
                     reportDao.updateHostMetadataById(reportId, albumMetadata);
                 }
-                if (!response.isCanContinue()) {
+                if (!response.isContinuable()) {
                     reportDao.updateStatusById(reportId, ReportStatus.PICTURE_SENDING_FAILURE);
                     itemDao.updateStatusByReportId(reportId, ElementStatus.NEW);
                     return Response.builder().succeeded(false).clientResponse(response).build();
@@ -117,7 +117,7 @@ public class UploadImagesService {
                 PictureMetadata pictureMetadata;
                 for (int i = 0; i < 3 ; i++) {
                     response = imageHostClient.uploadImage(path, pictureName, "desc.");
-                    if (response.isSuccess() || !response.isCanRetry()) {
+                    if (response.isSuccess() || !response.isRetryable()) {
                         break;
                     } else {
                         if (uploadManager.isStopped()) {
@@ -143,7 +143,7 @@ public class UploadImagesService {
                     itemDao.updateStatusByReportId(reportId, ElementStatus.NEW);
                     return Response.builder().succeeded(false).clientResponse(response).build();
                 }
-                if (!response.isCanContinue()) {
+                if (!response.isContinuable()) {
                     reportDao.updateStatusById(reportId, ReportStatus.PICTURE_SENDING_FAILURE);
                     itemDao.updateStatusByReportId(reportId, ElementStatus.NEW);
                     return Response.builder().succeeded(false).clientResponse(response).build();

@@ -1,9 +1,9 @@
-package com.marteczek.photoreporter.picturehostclient.imgur;
+package com.marteczek.photoreporter.imagehostclient.imgur;
 
 import android.content.Context;
 
-import com.marteczek.photoreporter.picturehostclient.BaseResponse;
-import com.marteczek.photoreporter.picturehostclient.ImageHostClient;
+import com.marteczek.photoreporter.imagehostclient.BaseResponse;
+import com.marteczek.photoreporter.imagehostclient.ImageHostClient;
 
 public class ImgurAnonymousClient extends ImgurAbstractClient implements ImageHostClient {
 

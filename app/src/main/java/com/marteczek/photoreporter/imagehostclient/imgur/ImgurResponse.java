@@ -1,7 +1,7 @@
-package com.marteczek.photoreporter.picturehostclient.imgur;
+package com.marteczek.photoreporter.imagehostclient.imgur;
 
-import com.marteczek.photoreporter.picturehostclient.BaseResponse;
-import com.marteczek.photoreporter.picturehostclient.imgur.data.PictureMetadata;
+import com.marteczek.photoreporter.imagehostclient.BaseResponse;
+import com.marteczek.photoreporter.imagehostclient.imgur.data.PictureMetadata;
 
 import java.util.Date;
 

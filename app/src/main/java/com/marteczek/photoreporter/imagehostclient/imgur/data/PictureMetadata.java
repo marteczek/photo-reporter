@@ -1,4 +1,4 @@
-package com.marteczek.photoreporter.picturehostclient.imgur.data;
+package com.marteczek.photoreporter.imagehostclient.imgur.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

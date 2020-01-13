@@ -1,6 +1,6 @@
-package com.marteczek.photoreporter.picturehostclient;
+package com.marteczek.photoreporter.imagehostclient;
 
-import com.marteczek.photoreporter.picturehostclient.imgur.data.PictureMetadata;
+import com.marteczek.photoreporter.imagehostclient.imgur.data.PictureMetadata;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public class BaseResponse {
     protected boolean success;
-    protected boolean canRetry;
-    protected boolean canContinue;
+    protected boolean retryable;
+    protected boolean continuable;
     protected boolean ioException;
     protected String albumMetadata;
     protected PictureMetadata pictureMetadata;

@@ -1,4 +1,4 @@
-package com.marteczek.photoreporter.picturehostclient.imgur.dto;
+package com.marteczek.photoreporter.imagehostclient.imgur.dto;
 
 import com.google.gson.annotations.SerializedName;
 

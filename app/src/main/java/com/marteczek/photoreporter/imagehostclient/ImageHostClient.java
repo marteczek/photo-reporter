@@ -1,4 +1,4 @@
-package com.marteczek.photoreporter.picturehostclient;
+package com.marteczek.photoreporter.imagehostclient;
 
 public interface ImageHostClient {
 
