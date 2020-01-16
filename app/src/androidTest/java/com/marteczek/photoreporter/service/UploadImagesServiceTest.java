@@ -87,6 +87,20 @@ public class UploadImagesServiceTest {
         verify(client, times(1)).uploadImage(any(), any(), any());
         verify(client, times(1)).disconnect();
         Report report = reportDao.findById(reportId);
+        assertNotNull(report);
+        List<Item> items = itemDao.findByReportId(reportId);
+        assertEquals(1, items.size());
+    }
+
+    @Test
+    public void uploadImages_reportWithOneItemProvided_correctStatusesAreSet() {
+        //given
+        configureClientWithResponseSuccess();
+        long reportId = insertReportWithOneItem();
+        //when
+        service.uploadImages(reportId, client, pictureFormat, uploadManager, null);
+        //then
+        Report report = reportDao.findById(reportId);
         assertEquals(ReportStatus.SENT, report.getStatus());
         List<Item> items = itemDao.findByReportId(reportId);
         assertEquals(1, items.size());

@@ -7,8 +7,8 @@ android {
         applicationId "com.marteczek.photoreporter"
         minSdkVersion 16
         targetSdkVersion 29
-        versionCode 4
-        versionName "1.0.0-alpha04"
+        versionCode 5
+        versionName "1.0.0-alpha05"
         android.defaultConfig.vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -71,6 +71,8 @@ dependencies {
     annotationProcessor "com.google.dagger:dagger-android-processor:$daggerVersion"
     // Gson
     implementation 'com.google.code.gson:gson:2.8.6'
+    // Exif Interface
+    implementation "androidx.exifinterface:exifinterface:1.1.0"
     // Testing
     androidTestImplementation "androidx.arch.core:core-testing:$coreTestingVersion"
     androidTestImplementation "androidx.test.ext:junit:1.1.1"

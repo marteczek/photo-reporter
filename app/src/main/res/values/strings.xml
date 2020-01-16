@@ -27,6 +27,7 @@
     <string name="preference_attach_signature">Attach the signature</string>
     <string name="preference_dimension_title">Greater dimension of the photo</string>
     <string name="preference_imgur_account">Imgur (account)</string>
+    <string name="preference_imgur_anonymous">Imgur (anonymous)</string>
     <string name="preference_one_post">One post</string>
     <string name="preference_personal_information">Personal</string>
     <string name="preference_picture_header">Picture</string>
@@ -94,4 +95,10 @@
     <string name="preference_watermark_position_title">Position</string>
     <string name="preference_apply_watermark_title">Apply watermark</string>
     <string name="action_add_pictures">Add pictures</string>
+    <string name="preference_apply_map_title">Add map</string>
+    <string name="preference_map_zoom_title">Zoom</string>
+    <string name="preference_map_header">Map</string>
+    <string name="preference_map_transparency_title">Transparency</string>
+    <string name="preference_map_title">Map</string>
+    <string name="title_fragment_settings_map">Settings (map)</string>
 </resources>

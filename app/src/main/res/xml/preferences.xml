@@ -47,6 +47,12 @@
             android:key="preference_watermark"
             android:title="@string/preference_watermark_title"
             app:fragment="com.marteczek.photoreporter.ui.SettingsActivity$SettingsWatermarkFragment" />
+
+        <Preference
+            android:key="preference_map"
+            android:title="@string/preference_map_title"
+            app:fragment="com.marteczek.photoreporter.ui.SettingsActivity$SettingsMapFragment" />
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/preference_personal_information">

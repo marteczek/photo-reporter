@@ -87,5 +87,29 @@
         <item>@string/preference_bottom_right</item>
     </string-array>
 
-    <string name="preference_imgur_anonymous">Imgur (anonymous)</string>
+    <string-array name="preference_map_zoom_entries" >
+        <item>+1</item>
+        <item>0</item>
+        <item>-1</item>
+        <item>-2</item>
+    </string-array>
+
+    <string-array name="preference_map_zoom_values" >
+        <item>+1</item>
+        <item>0</item>
+        <item>-1</item>
+        <item>-2</item>
+    </string-array>
+
+    <string-array name="preference_map_transparency_entries" >
+        <item>0</item>
+        <item>20%</item>
+        <item>40%</item>
+    </string-array>
+
+    <string-array name="preference_map_transparency_values" >
+        <item>0</item>
+        <item>20</item>
+        <item>40</item>
+    </string-array>
 </resources>

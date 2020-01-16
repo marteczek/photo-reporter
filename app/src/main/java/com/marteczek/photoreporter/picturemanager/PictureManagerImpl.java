@@ -5,9 +5,15 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.media.ExifInterface;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.util.Log;
+
+import androidx.exifinterface.media.ExifInterface;
+import androidx.lifecycle.MutableLiveData;
 
 import com.marteczek.photoreporter.R;
 import com.marteczek.photoreporter.application.Settings;
@@ -18,6 +24,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 import static com.marteczek.photoreporter.application.Settings.Debug.E;
 import static com.marteczek.photoreporter.picturemanager.ImageUtils.calculateInSampleSize;
 
@@ -25,7 +35,11 @@ import static com.marteczek.photoreporter.picturemanager.ImageUtils.calculateInS
 public class PictureManagerImpl implements PictureManager {
     private static final String TAG = "PictureManager";
 
-    private Context context;
+    private final static int MAP_SIZE = 200;
+
+    private final static int MAP_MARGIN = 20;
+
+    private final Context context;
 
     public PictureManagerImpl(Context context) {
         this.context = context.getApplicationContext();
@@ -79,45 +93,146 @@ public class PictureManagerImpl implements PictureManager {
 
     @Override
     public Bitmap preparePictureForUpload(String sourcePath, int rotation, int greaterDimension) {
+        Bitmap bitmap = prepareBaseBitmap(sourcePath, rotation, greaterDimension);
+        if (Settings.shouldApplyWatermark(context)) {
+            applyWaterMark(bitmap);
+        }
+        if (Settings.shouldApplyMap(context)) {
+            downloadAndApplyMap(sourcePath, bitmap);
+        }
+        return bitmap;
+    }
+
+    @Override
+    public void preparePictureForUpload(String sourcePath, int rotation, int greaterDimension,
+                                        MutableLiveData<Bitmap> resultantBitmap) {
+        Bitmap bitmap = prepareBaseBitmap(sourcePath, rotation, greaterDimension);
+        if (Settings.shouldApplyWatermark(context)) {
+            applyWaterMark(bitmap);
+        }
+        resultantBitmap.postValue(bitmap);
+        if (Settings.shouldApplyMap(context)) {
+            downloadAndApplyMap(sourcePath, bitmap);
+            resultantBitmap.postValue(bitmap);
+        }
+    }
+
+    private Bitmap prepareBaseBitmap(String sourcePath, int rotation, float greaterDimension) {
         Bitmap bitmap = BitmapFactory.decodeFile(sourcePath);
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
         Matrix matrix = new Matrix();
         matrix.postRotate(rotation);
-        float scale = (float) greaterDimension / Math.max(width, height);
+        float scale = greaterDimension / Math.max(width, height);
         matrix.postScale(scale, scale);
         bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
+        return bitmap;
+    }
+
+    private void applyWaterMark(Bitmap bitmap) {
+        int width;
+        int height;
         width = bitmap.getWidth();
         height = bitmap.getHeight();
-        if (Settings.shouldApplyWatermark(context)) {
-            String watermarkFileName = new File(getFilesDir(), Settings.WATERMARK_FILE_NAME).getAbsolutePath();
-            Bitmap watermark = BitmapFactory.decodeFile(watermarkFileName);
-            if (watermark != null) {
-                int left = 0;
-                int top = 0;
-                int distance = Settings.getWatermarkDistance(context);
-                String position = Settings.getWatermarkPosition(context);
-                if (position.equals(context.getString(R.string.preference_top_left))) {
-                    left = distance;
-                    top = distance;
-                }
-                if (position.equals(context.getString(R.string.preference_top_right))) {
-                    left = width - watermark.getWidth() - distance;
-                    top = distance;
-                }
-                if (position.equals(context.getString(R.string.preference_bottom_left))) {
-                    left = distance;
-                    top = height - watermark.getHeight() - distance;
-                }
-                if (position.equals(context.getString(R.string.preference_bottom_right))) {
-                    left = width - watermark.getWidth() - distance;
-                    top = height - watermark.getHeight() - distance;
-                }
-                Canvas canvas = new Canvas(bitmap);
-                canvas.drawBitmap(watermark, left, top, null);
+        String watermarkFileName = new File(getFilesDir(), Settings.WATERMARK_FILE_NAME).getAbsolutePath();
+        Bitmap watermark = BitmapFactory.decodeFile(watermarkFileName);
+        if (watermark != null) {
+            int left = 0;
+            int top = 0;
+            int distance = Settings.getWatermarkDistance(context);
+            String position = Settings.getWatermarkPosition(context);
+            if (position.equals(context.getString(R.string.preference_top_left))) {
+                left = distance;
+                top = distance;
             }
+            if (position.equals(context.getString(R.string.preference_top_right))) {
+                left = width - watermark.getWidth() - distance;
+                top = distance;
+            }
+            if (position.equals(context.getString(R.string.preference_bottom_left))) {
+                left = distance;
+                top = height - watermark.getHeight() - distance;
+            }
+            if (position.equals(context.getString(R.string.preference_bottom_right))) {
+                left = width - watermark.getWidth() - distance;
+                top = height - watermark.getHeight() - distance;
+            }
+            Canvas canvas = new Canvas(bitmap);
+            canvas.drawBitmap(watermark, left, top, null);
         }
-        return bitmap;
+    }
+
+    private void downloadAndApplyMap(String sourcePath, Bitmap baseBitmap) {
+        double[] latLong;
+        double angleOfView = 90;
+        Double imageDirection;
+        try {
+            ExifInterface exif = new androidx.exifinterface.media.ExifInterface(sourcePath);
+            latLong = exif.getLatLong();
+            if (latLong == null) {
+                return;
+            }
+            double focalLength = exif.getAttributeDouble("FocalLengthIn35mmFilm", -1);
+            if (focalLength != -1) {
+                int filmSize = 35;
+                angleOfView = 2 * Math.atan(filmSize / (2 * focalLength)) * 180 / Math.PI;
+            }
+            imageDirection = exif.getAttributeDouble("GPSImgDirection", -1);
+            String s1 = exif.getAttribute("GPSImgDirection");
+            if (imageDirection == -1) {
+                imageDirection = null;
+            }
+        } catch (IOException e) {
+            return;
+        }
+        int zoomDifference = Settings.getMapZoom(context);
+        boolean addMarker = imageDirection == null;
+        String url = "https://maps.googleapis.com/maps/api/staticmap?" +
+                "center=" + latLong[0] + "," + latLong[1] +
+                "&size=" + MAP_SIZE + "x" + MAP_SIZE +
+                "&zoom=" + (16 + zoomDifference) +
+                (addMarker ? "&markers=" + latLong[0] + "," + latLong[1] : "") +
+                "&key=" + Settings.getGoogleStaticMapKey();
+        OkHttpClient client = new OkHttpClient();
+        Request loadMapRequest = new Request.Builder().url(url).build();
+        Bitmap mapBitmap;
+        try {
+            Response response = client.newCall(loadMapRequest).execute();
+            InputStream stream = response.body().byteStream();
+            mapBitmap = BitmapFactory.decodeStream(stream);
+        } catch (IOException e) {
+            return;
+        }
+        if (mapBitmap != null) {
+            Bitmap bitmap = Bitmap.createBitmap(MAP_SIZE, MAP_SIZE,
+                    Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            if(false) {
+                Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                paint.setColor(0XFF000000);
+                canvas.drawCircle(MAP_SIZE / 2, MAP_SIZE / 2, MAP_SIZE / 2, paint);
+                paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+                canvas.drawBitmap(mapBitmap, 0, 0, paint);
+            } else {
+                canvas.drawBitmap(mapBitmap,0,0, null);
+            }
+            if (imageDirection != null) {
+                Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                paint.setColor(0X40000000);
+                int padding = 10;
+                canvas.drawArc(new RectF(padding, padding, MAP_SIZE - 1 - padding, MAP_SIZE - 1 - padding),
+                        -90 + imageDirection.floatValue() - (float) angleOfView / 2,
+                        (float) angleOfView, true, paint);
+                paint.setColor(0XFF800000);
+                canvas.drawCircle(MAP_SIZE /2, MAP_SIZE /2, 3, paint);
+            }
+            int left = baseBitmap.getWidth() - MAP_MARGIN - MAP_SIZE;
+            int top = MAP_MARGIN;
+            Paint paint = new Paint();
+            paint.setAlpha(255 - (int) (2.55 * Settings.getMapTransparency(context)));
+            canvas = new Canvas(baseBitmap);
+            canvas.drawBitmap(bitmap, left, top, paint);
+        }
     }
 
     @Override

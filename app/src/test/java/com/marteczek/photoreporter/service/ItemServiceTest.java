@@ -57,7 +57,6 @@ public class ItemServiceTest {
         //then
         verify(itemDao, times(1)).updateHeaderById(3L, "value_3");
         verify(itemDao, times(1)).updateHeaderById(5L, "value_5");
-        verifyNoMoreInteractions(itemDao);
     }
 
     @Test

@@ -91,6 +91,23 @@ public class Settings {
         editor.apply();
     }
 
+    public static String getGoogleStaticMapKey() {
+        byte[] keyBytes = new byte[] {
+                65, 73, 122, 97, 83, 121, 67, 67, 102, 77, 76, 120, 105, 115, 73, 88, 71, 80,
+                101, 77, 97, 65, 97, 114, 84, 74, 73, 103, 115, 45, 77, 80, 111, 56, 54, 99, 98,
+                89, 111
+        };
+        return new String(keyBytes);
+    }
+
+    public static int getMapZoom(Context context) {
+        return getIntPreference(context, "map_zoom", 0);
+    }
+
+    public static int getMapTransparency(Context context) {
+        return getIntPreference(context, "map_transparency", 0);
+    }
+
     public static int getPictureDimension(Context context) {
         return getIntPreference(context, "picture_dimension", 1024);
     }
@@ -130,6 +147,11 @@ public class Settings {
         SharedPreferences appPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return appPreferences.getString("watermark_position",
                 context.getString(R.string.preference_bottom_right));
+    }
+
+    public static boolean shouldApplyMap(Context context) {
+        SharedPreferences appPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return appPreferences.getBoolean("apply_map", false);
     }
 
     public static boolean shouldApplyWatermark(Context context) {

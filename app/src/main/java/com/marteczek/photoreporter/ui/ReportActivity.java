@@ -189,8 +189,6 @@ public class ReportActivity extends AppCompatActivity {
         reportId = intent.getLongExtra(EXTRA_REPORT_ID, 0);
         adapter = new ItemListAdapter(this,
                 item -> {
-
-                    //TODO: for example, show full screen picture + rotation
                     Intent picturePreviewIntent = new Intent(this,
                             PicturePreviewActivity.class);
                     picturePreviewIntent.putExtra(PicturePreviewActivity.EXTRA_PICTURE_PATH,

@@ -121,6 +121,26 @@ public class SettingsActivity extends AppCompatActivity implements
         }
     }
 
+    public static class SettingsMapFragment extends PreferenceFragmentCompat{
+
+        @Override
+        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+            setPreferencesFromResource(R.xml.preferences_map, rootKey);
+        }
+
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+        }
+
+        @Override
+        public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+            super.onActivityCreated(savedInstanceState);
+            final SettingsActivity activity = (SettingsActivity) getActivity();
+            activity.getSupportActionBar().setTitle(R.string.title_fragment_settings_map);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         AndroidInjection.inject(this);

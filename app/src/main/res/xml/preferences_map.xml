@@ -1,0 +1,28 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory app:title="@string/preference_map_header">
+
+        <SwitchPreferenceCompat
+            app:key="apply_map"
+            app:defaultValue="false"
+            app:title="@string/preference_apply_map_title" />
+
+        <ListPreference
+            app:key="map_zoom"
+            app:defaultValue="0"
+            app:entries="@array/preference_map_zoom_entries"
+            app:entryValues="@array/preference_map_zoom_values"
+            app:title="@string/preference_map_zoom_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:key="map_transparency"
+            app:defaultValue="20"
+            app:entries="@array/preference_map_transparency_entries"
+            app:entryValues="@array/preference_map_transparency_values"
+            app:title="@string/preference_map_transparency_title"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

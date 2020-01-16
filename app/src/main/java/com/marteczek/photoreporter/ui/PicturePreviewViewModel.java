@@ -15,7 +15,7 @@ import com.marteczek.photoreporter.picturemanager.PictureManager;
 
 public class PicturePreviewViewModel extends AndroidViewModel {
 
-    private MutableLiveData<Bitmap> picture;
+    private MutableLiveData<Bitmap> pictureLiveData;
 
     private LoadPictureTask loadPictureTask;
 
@@ -29,20 +29,20 @@ public class PicturePreviewViewModel extends AndroidViewModel {
 
         private int greaterDimension;
 
-        MutableLiveData<Bitmap> picture;
+        MutableLiveData<Bitmap> pictureLiveData;
 
         LoadPictureTask(Context context, PictureManager pictureManager, int rotation,
-                               MutableLiveData<Bitmap> picture) {
+                               MutableLiveData<Bitmap> pictureLiveData) {
             this.pictureManager = pictureManager;
             this.rotation = rotation;
-            this.picture = picture;
+            this.pictureLiveData = pictureLiveData;
             greaterDimension = Settings.getPictureDimension(context);
         }
 
         @Override
         protected Void doInBackground(String... paths) {
-            Bitmap bitmap = pictureManager.preparePictureForUpload(paths[0], rotation, greaterDimension);
-            picture.postValue(bitmap);
+            pictureManager.preparePictureForUpload(paths[0], rotation, greaterDimension,
+                    pictureLiveData);
             return null;
         }
     }
@@ -61,12 +61,12 @@ public class PicturePreviewViewModel extends AndroidViewModel {
     }
 
     LiveData<Bitmap> getPicture(String path, int rotation) {
-        if (picture == null) {
-            picture = new MutableLiveData<>();
+        if (pictureLiveData == null) {
+            pictureLiveData = new MutableLiveData<>();
             loadPictureTask = new LoadPictureTask(getApplication(), pictureManager, rotation,
-                    picture);
+                    pictureLiveData);
             loadPictureTask.execute(path);
         }
-        return picture;
+        return pictureLiveData;
     }
 }
