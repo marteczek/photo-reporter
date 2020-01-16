@@ -101,4 +101,10 @@
     <string name="preference_map_transparency_title">Transparency</string>
     <string name="preference_map_title">Map</string>
     <string name="title_fragment_settings_map">Settings (map)</string>
+    <string name="preference_apply_gps_direction_title">GPS direction</string>
+    <string name="preference_map_shape_title">Shape</string>
+    <string name="preference_square_title">Square</string>
+    <string name="preference_circle_title">Circle</string>
+    <string name="preference_square" translatable="false">square</string>
+    <string name="preference_circle" translatable="false">circle</string>
 </resources>

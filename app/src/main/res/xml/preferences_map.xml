@@ -23,6 +23,20 @@
             app:entryValues="@array/preference_map_transparency_values"
             app:title="@string/preference_map_transparency_title"
             app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:key="map_shape"
+            app:defaultValue="@string/preference_square"
+            app:entries="@array/preference_map_shape_entries"
+            app:entryValues="@array/preference_map_shape_values"
+            app:title="@string/preference_map_shape_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            app:key="apply_gps_direction"
+            app:defaultValue="true"
+            app:title="@string/preference_apply_gps_direction_title" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>

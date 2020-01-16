@@ -112,4 +112,14 @@
         <item>20</item>
         <item>40</item>
     </string-array>
+
+    <string-array name="preference_map_shape_entries">
+        <item>@string/preference_square_title</item>
+        <item>@string/preference_circle_title</item>
+    </string-array>
+
+    <string-array name="preference_map_shape_values">
+        <item>@string/preference_square</item>
+        <item>@string/preference_circle</item>
+    </string-array>
 </resources>

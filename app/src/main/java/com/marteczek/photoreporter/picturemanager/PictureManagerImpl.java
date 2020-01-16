@@ -33,7 +33,9 @@ import static com.marteczek.photoreporter.picturemanager.ImageUtils.calculateInS
 
 
 public class PictureManagerImpl implements PictureManager {
-    private static final String TAG = "PictureManager";
+    private static final String TAG = "PictureManagerImpl";
+
+    private static final String URL_STATIC_MAP = "https://maps.googleapis.com/maps/api/staticmap";
 
     private final static int MAP_SIZE = 200;
 
@@ -178,7 +180,6 @@ public class PictureManagerImpl implements PictureManager {
                 angleOfView = 2 * Math.atan(filmSize / (2 * focalLength)) * 180 / Math.PI;
             }
             imageDirection = exif.getAttributeDouble("GPSImgDirection", -1);
-            String s1 = exif.getAttribute("GPSImgDirection");
             if (imageDirection == -1) {
                 imageDirection = null;
             }
@@ -186,10 +187,14 @@ public class PictureManagerImpl implements PictureManager {
             return;
         }
         int zoomDifference = Settings.getMapZoom(context);
-        boolean addMarker = imageDirection == null;
-        String url = "https://maps.googleapis.com/maps/api/staticmap?" +
-                "center=" + latLong[0] + "," + latLong[1] +
-                "&size=" + MAP_SIZE + "x" + MAP_SIZE +
+        boolean addMarker = !Settings.shouldApplyGPSDirection(context) || imageDirection == null;
+        String shape = Settings.getMapShape(context);
+        int copyrightHeight = 25;
+        int additionalHeight = shape.equals(context.getString(R.string.preference_circle))
+                ? copyrightHeight : 0;
+        String url = URL_STATIC_MAP +
+                "?center=" + latLong[0] + "," + latLong[1] +
+                "&size=" + MAP_SIZE + "x" + (MAP_SIZE + additionalHeight) +
                 "&zoom=" + (16 + zoomDifference) +
                 (addMarker ? "&markers=" + latLong[0] + "," + latLong[1] : "") +
                 "&key=" + Settings.getGoogleStaticMapKey();
@@ -204,19 +209,22 @@ public class PictureManagerImpl implements PictureManager {
             return;
         }
         if (mapBitmap != null) {
-            Bitmap bitmap = Bitmap.createBitmap(MAP_SIZE, MAP_SIZE,
+            Bitmap bitmap = Bitmap.createBitmap(MAP_SIZE, MAP_SIZE + additionalHeight,
                     Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
-            if(false) {
+            if (shape.equals(context.getString(R.string.preference_circle))) {
                 Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
                 paint.setColor(0XFF000000);
                 canvas.drawCircle(MAP_SIZE / 2, MAP_SIZE / 2, MAP_SIZE / 2, paint);
+                if (additionalHeight > 0) {
+                    canvas.drawRect(0, MAP_SIZE, MAP_SIZE - 1, MAP_SIZE - 1 + additionalHeight, paint);
+                }
                 paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
                 canvas.drawBitmap(mapBitmap, 0, 0, paint);
             } else {
                 canvas.drawBitmap(mapBitmap,0,0, null);
             }
-            if (imageDirection != null) {
+            if (Settings.shouldApplyGPSDirection(context) && imageDirection != null) {
                 Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
                 paint.setColor(0X40000000);
                 int padding = 10;

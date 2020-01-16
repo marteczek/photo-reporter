@@ -100,12 +100,17 @@ public class Settings {
         return new String(keyBytes);
     }
 
-    public static int getMapZoom(Context context) {
-        return getIntPreference(context, "map_zoom", 0);
+    public static String getMapShape(Context context) {
+        SharedPreferences appPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return appPreferences.getString("map_shape", context.getString(R.string.preference_square));
     }
 
     public static int getMapTransparency(Context context) {
         return getIntPreference(context, "map_transparency", 0);
+    }
+
+    public static int getMapZoom(Context context) {
+        return getIntPreference(context, "map_zoom", 0);
     }
 
     public static int getPictureDimension(Context context) {
@@ -147,6 +152,11 @@ public class Settings {
         SharedPreferences appPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return appPreferences.getString("watermark_position",
                 context.getString(R.string.preference_bottom_right));
+    }
+
+    public static boolean shouldApplyGPSDirection(Context context) {
+        SharedPreferences appPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return appPreferences.getBoolean("apply_gps_direction", false);
     }
 
     public static boolean shouldApplyMap(Context context) {
