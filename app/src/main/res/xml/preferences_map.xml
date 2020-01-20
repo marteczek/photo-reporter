@@ -5,7 +5,7 @@
 
         <SwitchPreferenceCompat
             app:key="apply_map"
-            app:defaultValue="false"
+            app:defaultValue="true"
             app:title="@string/preference_apply_map_title" />
 
         <ListPreference
@@ -36,6 +36,14 @@
             app:key="apply_gps_direction"
             app:defaultValue="true"
             app:title="@string/preference_apply_gps_direction_title" />
+
+        <ListPreference
+            app:key="map_provider"
+            app:defaultValue="@string/preference_osm"
+            app:entries="@array/preference_map_provider_entries"
+            app:entryValues="@array/preference_map_provider_values"
+            app:title="@string/preference_map_provider_title"
+            app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
 

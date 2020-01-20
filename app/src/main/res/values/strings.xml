@@ -107,4 +107,8 @@
     <string name="preference_circle_title">Circle</string>
     <string name="preference_square" translatable="false">square</string>
     <string name="preference_circle" translatable="false">circle</string>
+    <string name="osm_copyright">Ⓒ OpenStreetMap contributors</string>
+    <string name="preference_map_provider_title">Map provider</string>
+    <string name="preference_osm" translatable="false">osm</string>
+    <string name="preference_google" translatable="false">google</string>
 </resources>

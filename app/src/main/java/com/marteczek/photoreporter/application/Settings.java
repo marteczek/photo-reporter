@@ -100,6 +100,11 @@ public class Settings {
         return new String(keyBytes);
     }
 
+    public static String getMapProvider(Context context) {
+        SharedPreferences appPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return appPreferences.getString("map_provider", context.getString(R.string.preference_osm));
+    }
+
     public static String getMapShape(Context context) {
         SharedPreferences appPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return appPreferences.getString("map_shape", context.getString(R.string.preference_square));

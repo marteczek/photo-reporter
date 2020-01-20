@@ -25,6 +25,8 @@ public class PhotoReporterApplication extends Application implements HasAndroidI
     public void onCreate() {
         super.onCreate();
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        PreferenceManager.setDefaultValues(this, R.xml.preferences_map, false);
+        PreferenceManager.setDefaultValues(this, R.xml.preferences_watermark, false);
         com.marteczek.photoreporter.application.configuration
                 .DaggerAppComponent.factory().create(this).inject(this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

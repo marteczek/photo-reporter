@@ -122,4 +122,15 @@
         <item>@string/preference_square</item>
         <item>@string/preference_circle</item>
     </string-array>
+
+    <string-array name="preference_map_provider_entries">
+        <item>Google</item>
+        <item>OpenStreetMap</item>
+    </string-array>
+
+    <string-array name="preference_map_provider_values">
+        <item>@string/preference_google</item>
+        <item>@string/preference_osm</item>
+    </string-array>
+
 </resources>
