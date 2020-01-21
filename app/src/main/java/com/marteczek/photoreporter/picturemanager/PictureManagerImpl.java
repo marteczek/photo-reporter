@@ -314,6 +314,7 @@ public class PictureManagerImpl implements PictureManager {
         int x = (xLargeMap - MAP_SIZE / 2) % 256;
         int y = (yLargeMap - MAP_SIZE / 2) % 256;
         if (osmFragment != null) {
+            // cut the map to the target area
             return Bitmap.createBitmap(osmFragment, x, y, MAP_SIZE, MAP_SIZE);
         } else {
             return null;
@@ -322,7 +323,7 @@ public class PictureManagerImpl implements PictureManager {
 
     private Bitmap downloadOsmFragment(OkHttpClient client, int xTile, int yTile,
                                        int xCount, int yCount, int zoom) {
-        Bitmap bitmap = Bitmap.createBitmap(xCount * MAP_SIZE, yCount * MAP_SIZE, Bitmap.Config.ARGB_8888);
+        Bitmap bitmap = Bitmap.createBitmap(xCount * 256, yCount * 256, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         for (int x = 0; x < xCount; x++){
             for (int y = 0; y < yCount; y++){
@@ -364,7 +365,7 @@ public class PictureManagerImpl implements PictureManager {
             drawRectangularOsmMap(mapBitmap, canvas);
         }
         if (Settings.shouldApplyGPSDirection(context) && shootingDirection != null) {
-            // draw an arc on the map showing return null;
+            // draw an arc on the map showing the photographed area
             paint.setColor(0X40000000);
             int padding = 16;
             int northDirection = -90;
@@ -388,11 +389,9 @@ public class PictureManagerImpl implements PictureManager {
     }
 
     private void drawRectangularOsmMap(Bitmap mapBitmap, Canvas canvas) {
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setColor(0XFF800000);
-        canvas.drawCircle(MAP_SIZE / 2, MAP_SIZE / 2, 3, paint);
         canvas.drawBitmap(mapBitmap, 0, 0, null);
         String text = context.getString(R.string.osm_copyright);
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setColor(Color.BLACK);
         paint.setTextSize(12f);
         float textWidth = paint.measureText(text);
@@ -406,7 +405,7 @@ public class PictureManagerImpl implements PictureManager {
         canvas.drawCircle(MAP_SIZE / 2, MAP_SIZE / 2, MAP_SIZE / 2, paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(mapBitmap, 0, 0, paint);
-        // draw OSM copyright on arc path
+        // draw the OSM copyright on an arc path
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setColor(Color.BLACK);
         paint.setTextSize(12f);
