@@ -37,9 +37,11 @@ import static com.marteczek.photoreporter.picturemanager.ImageUtils.calculateInS
 
 
 public class PictureManagerImpl implements PictureManager {
-    private static final String TAG = "PictureManagerImpl";
+    private static final String TAG = "PictureManager";
 
     private static final String URL_GOOGLE_STATIC_MAP = "https://maps.googleapis.com/maps/api/staticmap";
+
+    private static final String URL_OSM_TILES = "https://tile.openstreetmap.org/";
 
     private static final String USER_AGENT_FOR_OSM = "PhotoReporter/1.0 https://github.com/marteczek/photo-reporter";
 
@@ -48,6 +50,7 @@ public class PictureManagerImpl implements PictureManager {
     private final static int MAP_SIZE = 200;
 
     private final static int MAP_MARGIN = 20;
+
 
     private final Context context;
 
@@ -327,7 +330,7 @@ public class PictureManagerImpl implements PictureManager {
         Canvas canvas = new Canvas(bitmap);
         for (int x = 0; x < xCount; x++){
             for (int y = 0; y < yCount; y++){
-                String url = "https://tile.openstreetmap.org/"
+                String url = URL_OSM_TILES
                         + zoom + "/" + (xTile + x) + "/" + (yTile + y) + ".png";
                 Request request = new Request.Builder()
                         .url(url)
